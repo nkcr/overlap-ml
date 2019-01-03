@@ -14,7 +14,7 @@ import gc
 import data
 import model
 
-from utils import batchify, get_batch, repackage_hidden, create_exp_dir, \
+from utils import batchify, get_batch, repackage_hidden, \
     save_checkpoint, prepare_dir, get_logger, set_utils_logger, init_device, \
     save_args, save_commit_id, TensorBoard
 

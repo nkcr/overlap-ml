@@ -31,7 +31,7 @@ def batchify(data, bsz, args):
     data = data.narrow(0, 0, nbatch * bsz)
     # Evenly divide the data across the bsz batches.
     data = data.view(bsz, -1).t().contiguous().to(args.device)
-    print(data.size())
+    logger.info(f"(utils) Data size: {data.size()}.")
     return data
 
 
@@ -41,18 +41,6 @@ def get_batch(source, i, args, seq_len=None):
     # target = Variable(source[i+1:i+1+seq_len].view(-1))
     target = Variable(source[i+1:i+1+seq_len])
     return data, target
-
-
-def create_exp_dir(path, scripts_to_save=None):
-    if not os.path.exists(path):
-        os.mkdir(path)
-
-    print('Experiment dir : {}'.format(path))
-    if scripts_to_save is not None:
-        os.mkdir(os.path.join(path, 'scripts'))
-        for script in scripts_to_save:
-            dst_file = os.path.join(path, 'scripts', os.path.basename(script))
-            shutil.copyfile(script, dst_file)
 
 
 def save_checkpoint(model, optimizer, args, finetune=False):
