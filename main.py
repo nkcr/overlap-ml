@@ -269,7 +269,7 @@ def train():
         ###
         batch += 1
         i += seq_len
-        tot_step += 1
+        tot_steps += 1
 
 
 # Loop over epochs.
