@@ -91,9 +91,9 @@ def prepare_dir(args):
             model_dir = f"{args.model_dir_prefix}-{model_dir}"
         model_dir = os.path.join(args.log_dir, model_dir)
         setattr(args, "model_dir", model_dir)
-    if not os.path.exists(model_dir):
-        print(f"Creating {model_dir}")
-        os.makedirs(model_dir)
+    if not os.path.exists(args.model_dir):
+        print(f"Creating {args.model_dir}")
+        os.makedirs(args.model_dir)
 
 
 def save_commit_id(args, prefix=""):
