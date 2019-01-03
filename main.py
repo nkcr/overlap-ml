@@ -160,7 +160,7 @@ logger.info('Args: {}'.format(args))
 logger.info('Model total parameters: {}'.format(total_params))
 
 criterion = nn.CrossEntropyLoss()
-tot_step = 0
+tot_steps = 0
 
 ###############################################################################
 # Training code
@@ -189,7 +189,7 @@ def evaluate(data_source, batch_size=10):
 
 
 def train():
-    global tot_step
+    global tot_steps
     assert(args.batch_size % args.small_batch_size == 0,
            'batch_size must be divisible by small_batch_size')
 
