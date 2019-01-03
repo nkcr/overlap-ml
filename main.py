@@ -16,7 +16,7 @@ import model
 
 from utils import batchify, get_batch, repackage_hidden, \
     save_checkpoint, prepare_dir, get_logger, set_utils_logger, init_device, \
-    save_args, save_commit_id, TensorBoard
+    save_args, save_commit_id, TensorBoard, save_tb
 
 parser = argparse.ArgumentParser(
     description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model')
@@ -160,6 +160,7 @@ logger.info('Args: {}'.format(args))
 logger.info('Model total parameters: {}'.format(total_params))
 
 criterion = nn.CrossEntropyLoss()
+tot_step = 0
 
 ###############################################################################
 # Training code
@@ -188,6 +189,7 @@ def evaluate(data_source, batch_size=10):
 
 
 def train():
+    global tot_step
     assert(args.batch_size % args.small_batch_size == 0,
            'batch_size must be divisible by small_batch_size')
 
@@ -254,16 +256,20 @@ def train():
         if batch % args.log_interval == 0 and batch > 0:
             cur_loss = total_loss.item() / args.log_interval
             elapsed = time.time() - start_time
+            ppl = math.exp(cur_loss)
             logger.info('| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.2f} | ms/batch {:5.2f} | '
                         'loss {:5.2f} | ppl {:8.2f}'.format(
-                            epoch, batch, len(
-                                train_data) // args.bptt, optimizer.param_groups[0]['lr'],
-                            elapsed * 1000 / args.log_interval, cur_loss, math.exp(cur_loss)))
+                            epoch, batch, len(train_data) // args.bptt,
+                            optimizer.param_groups[0]['lr'],
+                            elapsed * 1000 / args.log_interval, cur_loss, ppl))
+            save_tb(tb, "train/loss", tot_steps, cur_loss)
+            save_tb(tb, "train/ppl", tot_steps, ppl)
             total_loss = 0
             start_time = time.time()
         ###
         batch += 1
         i += seq_len
+        tot_step += 1
 
 
 # Loop over epochs.
@@ -291,6 +297,8 @@ try:
     for epoch in range(1, args.epochs+1):
         epoch_start_time = time.time()
         train()
+        epoch_time = time.time() - epoch_start_time
+        save_tb(tb, "time/epoch", epoch, epoch_time)
         if 't0' in optimizer.param_groups[0]:
             tmp = {}
             for prm in model.parameters():
@@ -298,11 +306,14 @@ try:
                 prm.data = optimizer.state[prm]['ax'].clone()
 
             val_loss2 = evaluate(val_data)
+            ppl = math.exp(val_loss2)
             logger.info('-' * 89)
             logger.info('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
-                        'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
-                                                   val_loss2, math.exp(val_loss2)))
+                        'valid ppl {:8.2f}'.format(epoch, epoch_time,
+                                                   val_loss2, ppl))
             logger.info('-' * 89)
+            save_tb(tb, "val/loss", epoch, val_loss2)
+            save_tb(tb, "val/ppl", epoch, ppl)
 
             if val_loss2 < stored_loss:
                 save_checkpoint(model, optimizer, args)
@@ -314,11 +325,14 @@ try:
 
         else:
             val_loss = evaluate(val_data, eval_batch_size)
+            ppl = math.exp(val_loss)
             logger.info('-' * 89)
             logger.info('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
-                        'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
-                                                   val_loss, math.exp(val_loss)))
+                        'valid ppl {:8.2f}'.format(epoch, epoch_time,
+                                                   val_loss, ppl))
             logger.info('-' * 89)
+            save_tb(tb, "val/loss", epoch, val_loss)
+            save_tb(tb, "val/ppl", epoch, ppl)
 
             if val_loss < stored_loss:
                 save_checkpoint(model, optimizer, args)
@@ -342,7 +356,10 @@ parallel_model = nn.DataParallel(model, dim=1).to(args.device)
 
 # Run on test data.
 test_loss = evaluate(test_data, test_batch_size)
+ppl = math.exp(test_loss)
+save_tb(tb, "test/loss", 1, test_loss)
+save_tb(tb, "test/ppl", 1, ppl)
 logger.info('=' * 89)
 logger.info('| End of training | test loss {:5.2f} | test ppl {:8.2f}'.format(
-    test_loss, math.exp(test_loss)))
+    test_loss, ppl))
 logger.info('=' * 89)
