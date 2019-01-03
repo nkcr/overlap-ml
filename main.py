@@ -145,6 +145,7 @@ test_data = batchify(corpus.test, test_batch_size, args)
 ntokens = len(corpus.dictionary)
 if args.continue_train:
     model = torch.load(os.path.join(args.model_dir, 'model.pt'))
+    logger.info(f"Loading 'model.pt' at {args.model_dir}.")
 else:
     model = model.RNNModel(args.model, ntokens, args.emsize, args.nhid,
                            args.nhidlast, args.nlayers, args.dropout,
@@ -275,6 +276,7 @@ try:
     if args.continue_train:
         optimizer_state = torch.load(
             os.path.join(args.model_dir, 'optimizer.pt'))
+        logger.info(f"Loading 'optimizer.pt' at {args.model_dir}.")
         if 't0' in optimizer_state['param_groups'][0]:
             optimizer = torch.optim.ASGD(
                 model.parameters(), lr=args.lr, t0=0, lambd=0., weight_decay=args.wdecay)
