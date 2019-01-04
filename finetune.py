@@ -139,13 +139,9 @@ if args.continue_train:
     model = torch.load(os.path.join(args.model_dir, 'finetune_model.pt'))
 else:
     model = torch.load(os.path.join(args.model_dir, 'model.pt'))
-if args.cuda:
-    if args.single_gpu:
-        parallel_model = model.cuda()
-    else:
-        parallel_model = nn.DataParallel(model, dim=1).cuda()
-else:
-    parallel_model = model
+
+parallel_model = model.to(args.device)
+
 total_params = sum(x.size()[0] * x.size()[1] if len(x.size())
                    > 1 else x.size()[0] for x in model.parameters())
 logger.info('Args: {}'.format(args))
