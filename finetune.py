@@ -293,8 +293,7 @@ try:
             save_tb(tb, "ft/val/ppl", epoch, ppl)
 
             if val_loss2 < stored_loss:
-                save_checkpoint(model, optimizer,
-                                args.model_dir, finetune=True)
+                save_checkpoint(model, optimizer, args, finetune=True)
                 logger.info('Saving Averaged!')
                 stored_loss = val_loss2
 
