@@ -68,6 +68,7 @@ parser.add_argument('--no-cuda', action='store_true',
                     help='do NOT use CUDA')
 parser.add_argument('--log-interval', type=int, default=200, metavar='N',
                     help='report interval')
+
 # parser.add_argument('--save', type=str,  default='EXP',
 #                     help='path to save the final model')
 parser.add_argument('--log-dir', type=str, default='logs',
@@ -78,6 +79,7 @@ parser.add_argument('--model-dir-prefix', type=str,
                     help='A prefix to be added if the model-dir is '
                     'automatically created. Has no effect if --model-dir '
                     'is specified.')
+
 parser.add_argument('--alpha', type=float, default=2,
                     help='alpha L2 regularization on RNN activation '
                     '(alpha = 0 means no regularization)')
@@ -182,16 +184,16 @@ def evaluate(data_source, batch_size=10):
             loss = nn.functional.nll_loss(
                 log_prob.view(-1, log_prob.size(2)), targets).data
 
-            total_loss += loss * len(data)
-
+            total_loss += len(data) * loss
             hidden = repackage_hidden(hidden)
+
     return total_loss.item() / len(data_source)
 
 
 def train():
     global tot_steps
-    assert(args.batch_size % args.small_batch_size == 0,
-           'batch_size must be divisible by small_batch_size')
+    assert args.batch_size % args.small_batch_size == 0, \
+        'batch_size must be divisible by small_batch_size'
 
     # Turn on training mode which enables dropout.
     total_loss = 0
