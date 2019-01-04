@@ -134,7 +134,7 @@ class TensorBoard(object):
         self.summary_writer.add_summary(hist_summary, global_step=step)
 
 
-def get_logger(args, name=__name__, level=logging.INFO):
+def get_logger(args, name=__name__, level=logging.INFO, filename="file.log"):
     logger = logging.getLogger(name)
     if getattr(logger, '_init_done__', None):
         logger.setLevel(level)
@@ -146,7 +146,7 @@ def get_logger(args, name=__name__, level=logging.INFO):
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
     handler.setLevel(0)
-    f_handler = logging.FileHandler(os.path.join(args.model_dir, 'file.log'))
+    f_handler = logging.FileHandler(os.path.join(args.model_dir, filename))
     f_handler.setFormatter(formatter)
     f_handler.setLevel(0)
     del logger.handlers[:]
