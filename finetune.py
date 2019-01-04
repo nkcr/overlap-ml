@@ -148,6 +148,7 @@ logger.info('Args: {}'.format(args))
 logger.info('Model total parameters: {}'.format(total_params))
 
 criterion = nn.CrossEntropyLoss()
+tot_steps = 0
 
 ###############################################################################
 # Training code
