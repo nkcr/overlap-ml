@@ -189,11 +189,12 @@ def train():
         args.batch_size // args.small_batch_size)]
     batch, i = 0, 0
     while i < train_data.size(0) - 1 - 1:
-        bptt = args.bptt if np.random.random() < 0.95 else args.bptt / 2.
+        # bptt = args.bptt if np.random.random() < 0.95 else args.bptt / 2.
         # Prevent excessively small or negative sequence lengths
-        seq_len = max(5, int(np.random.normal(bptt, 5)))
+        # seq_len = max(5, int(np.random.normal(bptt, 5)))
         # There's a very small chance that it could select a very long sequence length resulting in OOM
-        seq_len = min(seq_len, args.bptt + args.max_seq_len_delta)
+        # seq_len = min(seq_len, args.bptt + args.max_seq_len_delta)
+        seq_len = args.bptt
 
         lr2 = optimizer.param_groups[0]['lr']
         optimizer.param_groups[0]['lr'] = lr2 * seq_len / args.bptt
