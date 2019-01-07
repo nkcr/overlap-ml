@@ -24,25 +24,6 @@ def repackage_hidden(h):
         return h.detach()
 
 
-def batchify(data, bsz, args):
-    # Work out how cleanly we can divide the dataset into bsz parts.
-    nbatch = data.size(0) // bsz
-    # Trim off any extra elements that wouldn't cleanly fit (remainders).
-    data = data.narrow(0, 0, nbatch * bsz)
-    # Evenly divide the data across the bsz batches.
-    data = data.view(bsz, -1).t().contiguous().to(args.device)
-    logger.info(f"(utils) Data size: {data.size()}.")
-    return data
-
-
-def get_batch(source, i, args, seq_len=None):
-    seq_len = min(seq_len if seq_len else args.bptt, len(source) - 1 - i)
-    data = Variable(source[i:i+seq_len])
-    # target = Variable(source[i+1:i+1+seq_len].view(-1))
-    target = Variable(source[i+1:i+1+seq_len])
-    return data, target
-
-
 def save_checkpoint(model, optimizer, args, finetune=False):
     model_name, opt_name = ('finetune_model.pt', 'finetune_optimizer.pt') \
         if finetune else ('model.pt', 'optimizer.pt')
