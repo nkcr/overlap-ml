@@ -26,7 +26,7 @@ class DataSelector:
 
         # train_data stats
         self.nitems = self.train_data.size(0) // self.args.bptt
-        # This ensures that the +1 for the tardet won't make out of bound
+        # This ensures that the +1 for the target won't make out of bound
         self.nitems = self.nitems - 1 if self.nitems * \
             self.args.bptt == self.train_data.size(0) else self.nitems
         self.logger.info(f"(excavator) Number of items: {self.nitems}")
@@ -74,9 +74,16 @@ class DataSelector:
     def train_seq(self):
         """Iterator over the train batches using `current_seq`
 
-        `current_seq` contains a 2D list of data ids for each batch. This list
-        is updated and indicates the content of each batch. To use this method
-        we must assume that `train_data` is of shape (-1, 1) ie. batch_size==1
+        `current_seq` contains a 2D list of datapoint ids, where each row is a
+        batch. This method iterates over the row (ie. batch) and yields the
+        tokens corresponding to the datapoints ids. It yields the data along
+        with its target.
+        To use this method we must assume that `train_data` is of shape (-1, 1)
+        ie. batch_size==1.
+
+        Shape:
+            data: (bptt, batch size)
+            target: (bptt, batch size)
         """
         assert self.train_data.size(1) == 1, "train_data must be one-column"
         bptt = self.args.bptt
@@ -86,7 +93,7 @@ class DataSelector:
             target = self.train_data[[i for k in batches_id for i in np.arange(
                 self.b2d[k]+1, self.b2d[k]+1 + bptt)]]
             yield data.view(-1, bptt).t().contiguous(), \
-                target.view(-1, bptt).t().contiguous().contiguous()
+                target.view(-1, bptt).t().contiguous()
 
     # ________________________________________________________________________
     # Train seq initialization
@@ -95,7 +102,7 @@ class DataSelector:
         """Returns a `current_seq` for a standard linear data selection
 
         The current_seq is a list that indicates the datapoints idx of each
-        batch.
+        batch, where each row is a batch.
 
         For example, if bsize equals 4 and there is 14 datapoints, here is the
         corresponding current_seq:
