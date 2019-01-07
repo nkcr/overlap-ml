@@ -105,6 +105,11 @@ parser.add_argument('--max_seq_len_delta', type=int, default=40,
                     help='max sequence length')
 parser.add_argument('--single_gpu', default=False, action='store_true',
                     help='use single GPU')
+
+parser.add_argument('--init-seq', type=str, default="original",
+                    help='Initialization of the ds.current_seq '
+                    '(original, overlapC_N (contiguous)')
+
 args = parser.parse_args()
 
 if args.nhidlast < 0:
@@ -132,6 +137,17 @@ tb = TensorBoard(args.model_dir)
 # DataSelector
 ds = DataSelector(args)
 
+# Init seq
+if args.init_seq == "original":
+    # Done by default in DataSelector initialization
+    pass
+elif args.init_seq.startswith("overlapC_"):
+    overlap = int(args.init_seq.split("_")[1])
+    if args.bptt % overlap != 0:
+        raise Exception(f"overlapC must divide '--bptt' (found {overlap})")
+    ds.current_seq = ds.overlap_c_seq(args.batch_size, overlap)
+else:
+    raise Exception(f"init-seq unkown: {args.init_seq}")
 
 ###############################################################################
 # Build the model
