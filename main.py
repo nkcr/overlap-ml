@@ -119,6 +119,11 @@ if args.dropoutl < 0:
 if args.small_batch_size < 0:
     args.small_batch_size = args.batch_size
 
+
+###############################################################################
+# Initializations
+###############################################################################
+
 # Prepare and sets the `model_dir`
 prepare_dir(args)
 # Logger init and set for utils
