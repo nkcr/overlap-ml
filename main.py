@@ -361,7 +361,7 @@ model = torch.load(os.path.join(args.model_dir, 'model.pt'))
 parallel_model = nn.DataParallel(model, dim=1).to(args.device)
 
 # Run on test data.
-test_loss = evaluate(ds.test_data, test_batch_size)
+test_loss = evaluate(ds.test_data, args.test_batch_size)
 ppl = math.exp(test_loss)
 save_tb(tb, "test/loss", 1, test_loss)
 save_tb(tb, "test/ppl", 1, ppl)
