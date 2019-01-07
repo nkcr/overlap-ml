@@ -13,8 +13,9 @@ import gc
 
 import data
 import model
+from excavator import DataSelector
 
-from utils import batchify, get_batch, repackage_hidden, \
+from utils import repackage_hidden, \
     save_checkpoint, prepare_dir, get_logger, set_utils_logger, init_device, \
     save_args, save_commit_id, TensorBoard, save_tb
 
@@ -126,30 +127,19 @@ save_args(args)
 save_commit_id(args)
 # Tensorboard
 tb = TensorBoard(args.model_dir)
+# DataSelector
+ds = DataSelector(args)
 
-
-###############################################################################
-# Load data
-###############################################################################
-
-corpus = data.Corpus(args.data)
-
-eval_batch_size = 10
-test_batch_size = 1
-train_data = batchify(corpus.train, args.batch_size, args)
-val_data = batchify(corpus.valid, eval_batch_size, args)
-test_data = batchify(corpus.test, test_batch_size, args)
 
 ###############################################################################
 # Build the model
 ###############################################################################
 
-ntokens = len(corpus.dictionary)
 if args.continue_train:
     model = torch.load(os.path.join(args.model_dir, 'model.pt'))
     logger.info(f"Loading 'model.pt' at {args.model_dir}.")
 else:
-    model = model.RNNModel(args.model, ntokens, args.emsize, args.nhid,
+    model = model.RNNModel(args.model, ds.ntokens, args.emsize, args.nhid,
                            args.nhidlast, args.nlayers, args.dropout,
                            args.dropouth, args.dropouti, args.dropoute,
                            args.wdrop, args.tied, args.dropoutl,
@@ -164,20 +154,19 @@ logger.info('Model total parameters: {}'.format(total_params))
 criterion = nn.CrossEntropyLoss()
 tot_steps = 0
 
+
 ###############################################################################
 # Training code
 ###############################################################################
-
 
 def evaluate(data_source, batch_size=10):
     # Turn on evaluation mode which disables dropout.
     model.eval()
     total_loss = 0
-    ntokens = len(corpus.dictionary)
     hidden = model.init_hidden(batch_size)
     with torch.no_grad():
         for i in range(0, data_source.size(0) - 1, args.bptt):
-            data, targets = get_batch(data_source, i, args)
+            data, targets = ds.get_batch(data_source, i)
             targets = targets.view(-1)
 
             log_prob, hidden = parallel_model(data, hidden)
@@ -198,17 +187,15 @@ def train():
     # Turn on training mode which enables dropout.
     total_loss = 0
     start_time = time.time()
-    ntokens = len(corpus.dictionary)
     hidden = [model.init_hidden(args.small_batch_size) for _ in range(
         args.batch_size // args.small_batch_size)]
-    batch, i = 0, 0
-    while i < train_data.size(0) - 1 - 1:
+    batch = 0
+    for data, targets in ds.train_seq():
         seq_len = args.bptt
 
         lr2 = optimizer.param_groups[0]['lr']
         optimizer.param_groups[0]['lr'] = lr2 * seq_len / args.bptt
         model.train()
-        data, targets = get_batch(train_data, i, args, seq_len=seq_len)
 
         optimizer.zero_grad()
 
@@ -256,7 +243,7 @@ def train():
             ppl = math.exp(cur_loss)
             logger.info('| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.2f} | ms/batch {:5.2f} | '
                         'loss {:5.2f} | ppl {:8.2f}'.format(
-                            epoch, batch, len(train_data) // args.bptt,
+                            epoch, batch, len(ds.current_seq),
                             optimizer.param_groups[0]['lr'],
                             elapsed * 1000 / args.log_interval, cur_loss, ppl))
             save_tb(tb, "train/loss", tot_steps, cur_loss)
@@ -265,7 +252,6 @@ def train():
             start_time = time.time()
         ###
         batch += 1
-        i += seq_len
         tot_steps += 1
 
 
@@ -302,7 +288,7 @@ try:
                 tmp[prm] = prm.data.clone()
                 prm.data = optimizer.state[prm]['ax'].clone()
 
-            val_loss2 = evaluate(val_data)
+            val_loss2 = evaluate(ds.val_data)
             ppl = math.exp(val_loss2)
             logger.info('-' * 89)
             logger.info('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
@@ -321,7 +307,7 @@ try:
                 prm.data = tmp[prm].clone()
 
         else:
-            val_loss = evaluate(val_data, eval_batch_size)
+            val_loss = evaluate(ds.val_data, eval_batch_size)
             ppl = math.exp(val_loss)
             logger.info('-' * 89)
             logger.info('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
@@ -352,7 +338,7 @@ model = torch.load(os.path.join(args.model_dir, 'model.pt'))
 parallel_model = nn.DataParallel(model, dim=1).to(args.device)
 
 # Run on test data.
-test_loss = evaluate(test_data, test_batch_size)
+test_loss = evaluate(ds.test_data, test_batch_size)
 ppl = math.exp(test_loss)
 save_tb(tb, "test/loss", 1, test_loss)
 save_tb(tb, "test/ppl", 1, ppl)
