@@ -44,6 +44,8 @@ parser.add_argument('--batch_size', type=int, default=20, metavar='N',
                     help='batch size')
 parser.add_argument('--eval_batch_size', type=int, default=10, metavar='N',
                     help='eval batch size')
+parser.add_argument('--test_batch_size', type=int, default=1, metavar='N',
+                    help='test batch size')
 parser.add_argument('--bptt', type=int, default=70,
                     help='sequence length')
 parser.add_argument('--dropout', type=float, default=0.4,
