@@ -19,10 +19,9 @@ class DataSelector:
         corpus = data.Corpus(args.data)
         self.ntokens = len(corpus.dictionary)
 
-        eval_batch_size = 10
         test_batch_size = 1
         self.train_data = self.batchify(corpus.train, 1)
-        self.val_data = self.batchify(corpus.valid, eval_batch_size)
+        self.val_data = self.batchify(corpus.valid, self.args.eval_batch_size)
         self.test_data = self.batchify(corpus.test, test_batch_size)
 
         # train_data stats

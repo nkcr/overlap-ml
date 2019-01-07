@@ -42,6 +42,8 @@ parser.add_argument('--epochs', type=int, default=8000,
                     help='upper epoch limit')
 parser.add_argument('--batch_size', type=int, default=20, metavar='N',
                     help='batch size')
+parser.add_argument('--eval_batch_size', type=int, default=10, metavar='N',
+                    help='eval batch size')
 parser.add_argument('--bptt', type=int, default=70,
                     help='sequence length')
 parser.add_argument('--dropout', type=float, default=0.4,
@@ -307,7 +309,7 @@ try:
                 prm.data = tmp[prm].clone()
 
         else:
-            val_loss = evaluate(ds.val_data, eval_batch_size)
+            val_loss = evaluate(ds.val_data, args.eval_batch_size)
             ppl = math.exp(val_loss)
             logger.info('-' * 89)
             logger.info('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
