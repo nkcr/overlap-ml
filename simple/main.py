@@ -30,6 +30,14 @@ class SimpleLSTM(nn.Module):
 
         self.decoder = nn.Linear(args.emsize, ntokens)
 
+        self.init_weights()
+
+    def init_weights(self):
+        init_range = 0.1
+        self.embedding.weight.data.uniform_(-init_range, init_range)
+        self.decoder.bias.data.fill_(0.0)
+        self.decoder.weight.data.uniform_(-init_range, init_range)
+
     def forward(self, data, hidden):
         batch_size = data.size(1)
         # hidden is a tuple (h_0, c_0)
