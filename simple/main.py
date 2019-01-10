@@ -26,25 +26,25 @@ class SimpleLSTM(nn.Module):
         self.embedding = nn.Embedding(ntokens, args.emsize)
 
         self.lstm = nn.LSTM(input_size=args.emsize,
-                            hidden_size=args.nhid, num_layers=args.nlayers)
+                            hidden_size=args.emsize, num_layers=args.nlayers)
 
-        self.decoder = nn.Linear(args.nhid, ntokens)
+        self.decoder = nn.Linear(args.emsize, ntokens)
 
     def forward(self, data, hidden):
+        batch_size = data.size(1)
         # hidden is a tuple (h_0, c_0)
         data = self.embedding(data)
         output, hidden = self.lstm(data, hidden)
-        output = self.decoder(output.view(-1, self.args.nhid))
-        output = output.view(
-            self.args.bptt, self.args.batch_size, self.ntokens)
+        output = self.decoder(output.view(-1, self.args.emsize))
+        output = output.view(-1, batch_size, self.ntokens)
         return output, hidden
 
     def init_hidden(self, batch_size):
         weight = next(self.parameters()).data
         return (torch.tensor(weight.new(self.args.nlayers, batch_size,
-                                        self.args.nhid).zero_()),
+                                        self.args.emsize).zero_()),
                 torch.tensor(weight.new(self.args.nlayers, batch_size,
-                                        self.args.nhid).zero_()))
+                                        self.args.emsize).zero_()))
 
 
 if args.continue_train:
@@ -77,11 +77,10 @@ def evaluate(data_source, batch_size=10):
     with torch.no_grad():
         for i in range(0, data_source.size(0) - 1, args.bptt):
             data, targets = ds.get_batch(data_source, i)
-            targets = torch.squeeze(
-                targets.view(-1, batch_size * args.bptt))
+            targets = targets.view(-1)
 
             output, hidden = model(data, hidden)
-            loss = criterion(output.view(-1, ds.ntokens), targets).data
+            loss = criterion(output.view(-1, output.size(2)), targets).data
             total_loss += len(data) * loss
 
             hidden = repackage_hidden(hidden)
@@ -97,12 +96,11 @@ def train():
     hidden = model.init_hidden(args.batch_size)
     start_time = time.time()
     for data, targets in ds.train_seq():
-        targets = torch.squeeze(
-            targets.view(-1, args.batch_size * args.bptt))
+        targets = targets.view(-1)
         model.zero_grad()
         hidden = repackage_hidden(hidden)
         output, hidden = model(data, hidden)
-        loss = criterion(output.view(-1, ds.ntokens), targets)
+        loss = criterion(output.view(-1, output.size(2)), targets)
         loss.backward()
         optimizer.step()
 
