@@ -102,3 +102,5 @@ ENV/
 
 data/*
 logs/
+
+.DS_Store

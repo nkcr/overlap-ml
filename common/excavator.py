@@ -1,5 +1,5 @@
-import data
-from utils import get_logger
+from common import data
+from common.utils import get_logger
 from torch.autograd import Variable
 import numpy as np
 
@@ -35,7 +35,21 @@ class DataSelector:
         self.b2d = self.init_b2d()
 
         # this list holds the idx of datapoints for each batch
-        self.current_seq = self.manual_seq(args.batch_size)
+        self._current_seq = self.manual_seq(args.batch_size)
+
+        # keeps track of the number of batches
+        self.nbatch = len(self.current_seq)
+
+    @property
+    def current_seq(self):
+        return self._current_seq
+
+    @current_seq.setter
+    def current_seq(self, value):
+        self._current_seq = value
+        self.nbatch = len(self.current_seq)
+        self.logger.info(f"(excavator) New current_seq. "
+                         f"Shape: {np.shape(self.current_seq)}")
 
     # ________________________________________________________________________
     # Utility / Initializations

@@ -122,8 +122,8 @@ def save_hist(tb, name, epoch, values):
 
 
 class TensorBoard(object):
-    def __init__(self, model_dir):
-        self.summary_writer = tb.FileWriter(model_dir)
+    def __init__(self, model_dir, sub_dir=""):
+        self.summary_writer = tb.FileWriter(os.path.join(model_dir, sub_dir))
 
     def scalar_summary(self, tag, value, step):
         summary = Summary(value=[Summary.Value(tag=tag, simple_value=value)])
