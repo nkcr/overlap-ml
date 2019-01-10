@@ -21,6 +21,7 @@ class SimpleLSTM(nn.Module):
     def __init__(self, args, ntokens):
         super(SimpleLSTM, self).__init__()
         self.args = args
+        self.ntokens = ntokens
 
         self.embedding = nn.Embedding(ntokens, args.emsize)
 
@@ -33,8 +34,10 @@ class SimpleLSTM(nn.Module):
         # hidden is a tuple (h_0, c_0)
         data = self.embedding(data)
         output, hidden = self.lstm(data, hidden)
-        logits = self.decoder(output.view(-1, self.args.emsize))
-        return logits, hidden
+        output = self.decoder(output.view(-1, self.args.nhid))
+        output = output.view(
+            self.args.bptt * self.args.batch_size, self.ntokens)
+        return output, hidden
 
     def init_hidden(self, batch_size):
         weight = next(self.parameters()).data
