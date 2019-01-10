@@ -33,7 +33,8 @@ class SimpleLSTM(nn.Module):
         # hidden is a tuple (h_0, c_0)
         data = self.embedding(data)
         output, hidden = self.lstm(data, hidden)
-        return self.decoder(output), hidden
+        logits = self.decoder(output.view(-1, self.args.emsize))
+        return logits, hidden
 
     def init_hidden(self, batch_size):
         weight = next(self.parameters()).data
@@ -76,7 +77,7 @@ def evaluate(data_source, batch_size=10):
             targets = targets.view(-1)
 
             output, hidden = model(data, hidden)
-            loss = criterion(output.view(-1, ds.ntokens), targets).data
+            loss = criterion(output, targets).data
             total_loss += len(data) * loss
 
             hidden = repackage_hidden(hidden)
@@ -92,10 +93,11 @@ def train():
     hidden = model.init_hidden(args.batch_size)
     start_time = time.time()
     for data, targets in ds.train_seq():
+        targets = targets.view(-1)
         model.zero_grad()
         hidden = repackage_hidden(hidden)
         output, hidden = model(data, hidden)
-        loss = criterion(output.view(-1, ds.ntokens), targets.view(-1))
+        loss = criterion(output, targets)
         loss.backward()
         optimizer.step()
 
