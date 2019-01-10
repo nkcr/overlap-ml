@@ -88,6 +88,7 @@ def train():
     global tot_steps
     batch = 0
     total_loss = 0
+    model.train()
     hidden = model.init_hidden(args.batch_size)
     start_time = time.time()
     for data, targets in ds.train_seq():
