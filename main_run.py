@@ -107,9 +107,6 @@ class Simple:
         parser = argparse.ArgumentParser(
             description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model')
         add_common_args(parser, "simple")
-        parser.add_argument('--model', type=str, default='LSTM',
-                            help='type of recurrent net '
-                            '(RNN_TANH, RNN_RELU, LSTM, GRU, SRU)')
 
         args = parser.parse_args()
         return args
