@@ -78,7 +78,7 @@ def evaluate(data_source, batch_size=10):
         for i in range(0, data_source.size(0) - 1, args.bptt):
             data, targets = ds.get_batch(data_source, i)
             targets = torch.squeeze(
-                targets.view(-1, args.batch_size * args.bptt))
+                targets.view(-1, batch_size * args.bptt))
 
             output, hidden = model(data, hidden)
             loss = criterion(output.view(-1, ds.ntokens), targets).data
