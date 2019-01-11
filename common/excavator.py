@@ -2,6 +2,10 @@ from common import data
 from common.utils import get_logger
 from torch.autograd import Variable
 import numpy as np
+import random
+import hashlib
+import os
+import torch
 
 
 class DataSelector:
@@ -9,14 +13,21 @@ class DataSelector:
     """
 
     def __init__(self, args):
-        """
-        Args:
-            - args: an object containing the script's parameters
-        """
         self.args = args
         self.logger = get_logger(self.args)
+        random.seed(args.seed_shuffle)
 
-        corpus = data.Corpus(args.data)
+        data_hash = args.data.encode() + args.main_model.encode()
+        fn = 'corpus.{}.data'.format(
+            hashlib.md5(data_hash).hexdigest())
+        if os.path.exists(fn):
+            self.logger.info('(excavator) Loading cached dataset...')
+            corpus = torch.load(fn)
+        else:
+            self.logger.info('(excavator) Producing dataset...')
+            corpus = data.Corpus(args.data)
+            torch.save(corpus, fn)
+
         self.ntokens = len(corpus.dictionary)
 
         self.train_data = self.batchify(corpus.train, 1)
@@ -39,6 +50,14 @@ class DataSelector:
 
         # keeps track of the number of batches
         self.nbatch = len(self.current_seq)
+
+    @property
+    def data_size(self):
+        return len(self.current_seq) * len(self.current_seq[0])
+
+    @property
+    def batch_size(self):
+        return len(self.current_seq[0])
 
     @property
     def current_seq(self):

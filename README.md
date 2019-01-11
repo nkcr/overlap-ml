@@ -16,3 +16,14 @@ python3 main_run.py --main-model simple-lstm --epochs 1000
 ## MOS lstm
 
 TODO
+
+## AWD lstm
+
+Fast run:
+
+```bash
+python3 main_run.py --batch-size 20 --data data/penn --dropouti 0.4 \
+                    --dropouth 0.25 --seed 141 --epoch 1 \
+                    --nhid 5 --emsize 5 --nlayers 1 --bptt 5 \
+                    --main-model awd-lstm
+```

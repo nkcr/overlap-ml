@@ -3,6 +3,8 @@ import torch
 import argparse
 from common.utils import prepare_dir, get_logger, set_utils_logger, init_device, save_args, save_commit_id, TensorBoard
 from common.excavator import DataSelector
+from common.oracle import StatsKeeper
+import time
 
 
 def add_common_args(parser, model_name):
@@ -53,6 +55,8 @@ def add_common_args(parser, model_name):
                         help='number of hidden units per layer')
     parser.add_argument('--nlayers', type=int, default=3,
                         help='number of layers')
+    parser.add_argument('--clip', type=float, default=0.25,
+                        help='gradient clipping')
 
     parser.add_argument('--wdecay', type=float, default=1.2e-6,
                         help='weight decay applied to all weights')
@@ -63,6 +67,11 @@ def add_common_args(parser, model_name):
     parser.add_argument('--init-seq', type=str, default="original",
                         help='Initialization of the ds.current_seq '
                         '(original, overlapC_N (contiguous)')
+
+    parser.add_argument('--stat-folder', type=str, default="stats/",
+                        help='Folder to store the stats inside the log '
+                        'folder if relative, else to the absolute path plus '
+                        'the model id.')
 
 
 def common_init(that):
@@ -82,6 +91,7 @@ def common_init(that):
     save_commit_id(that.args)
     that.tb = TensorBoard(that.args.model_dir)
     that.ds = DataSelector(that.args)
+    that.sk = StatsKeeper(that.args, that.args.stat_folder)
 
     # Init seq
     if that.args.init_seq == "original":
@@ -105,8 +115,107 @@ class Simple:
 
     def init_args(self):
         parser = argparse.ArgumentParser(
-            description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model')
+            description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model',
+            conflict_handler='resolve')
         add_common_args(parser, "simple")
+
+        args = parser.parse_args()
+        return args
+
+
+class AWD:
+    """This class handles the arguments"""
+
+    def __init__(self):
+        common_init(self)
+
+    def init_args(self):
+        parser = argparse.ArgumentParser(
+            description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model',
+            conflict_handler='resolve')
+
+        add_common_args(parser, "awd")
+
+        parser.add_argument('--model', type=str, default='LSTM',
+                            help='type of recurrent net (LSTM, QRNN, GRU)')
+        parser.add_argument('--dropout', type=float, default=0.4,
+                            help='dropout applied to layers (0 = no dropout)')
+        parser.add_argument('--dropouth', type=float, default=0.3,
+                            help='dropout for rnn layers (0 = no dropout)')
+        parser.add_argument('--dropouti', type=float, default=0.65,
+                            help='dropout for input embedding layers (0 = no dropout)')
+        parser.add_argument('--dropoute', type=float, default=0.1,
+                            help='dropout to remove words from embedding layer (0 = no dropout)')
+        parser.add_argument('--wdrop', type=float, default=0.5,
+                            help='amount of weight dropout to apply to the RNN hidden to hidden matrix')
+        parser.add_argument('--nonmono', type=int, default=5,
+                            help='random seed')
+        parser.add_argument('--alpha', type=float, default=2,
+                            help='alpha L2 regularization on RNN activation (alpha = 0 means no regularization)')
+        parser.add_argument('--beta', type=float, default=1,
+                            help='beta slowness regularization applied on RNN activiation (beta = 0 means no regularization)')
+        parser.add_argument('--wdecay', type=float, default=1.2e-6,
+                            help='weight decay applied to all weights')
+        parser.add_argument('--resume', type=str,  default='',
+                            help='path of model to resume')
+        parser.add_argument('--optimizer', type=str,  default='sgd',
+                            help='optimizer to use (sgd, adam)')
+        parser.add_argument('--when', nargs="+", type=int, default=[-1],
+                            help='When (which epochs) to divide the learning rate by 10 - accepts multiple')
+
+        # Our custum parameters
+        parser.add_argument('--batch-max', type=int, default=128,
+                            help='Maximum number of data point in a batch')
+        parser.add_argument('--policy-every', type=int, default=-1,
+                            help='Steps when to update the policy')
+        parser.add_argument('--policy-retarder', type=int, default=1,
+                            help='Multiplicator of the --policy-every')
+        parser.add_argument('--size-bdrop', type=int, default="-1",
+                            help='Which batch size we drop half batch')
+        parser.add_argument('--bdrop-epochs', nargs="+", type=int, default=[-1],
+                            help='Which epoch we drop half batch')
+        parser.add_argument('--init-seq', type=str, default="original",
+                            help='Initialization of the ds.current_seq '
+                            '(original, one, overlap_2, overlapC_2 (contiguous), '
+                            'overlapCP_2 (contiguous-pruned), overlapCR_2 (contiguous-row), '
+                            'overlapCF_2 (contiguous-fake), rotate_2, random_rotate, transposed')
+        parser.add_argument('--train-seq', type=str, default="original",
+                            help='Which ds.train_seq method to use (original, random, window_N, repeat_N')
+        parser.add_argument('--get-priors', action="store_true",
+                            help="Computes loss of each batch")
+        parser.add_argument('--shuffle-seq', action="store_true",
+                            help="Shuffles the ds.train_seq (row-wise) before training")
+        parser.add_argument('--shuffle2-seq', action="store_true",
+                            help="Shuffles the ds.train_seq (column-wise) before training")
+        parser.add_argument('--shuffle3-seq', action="store_true",
+                            help="Shuffles the ds.train_seq for each row individually")
+        parser.add_argument('--shuffle4-seq', action="store_true",
+                            help="Shuffles the ds.train_seq row and column wise (complete)")
+        parser.add_argument('--update-random-rotate', action="store_true",
+                            help="Rotates the current_seq randomly at each epoch using seed-shuffle")
+        parser.add_argument('--fixedbsize-epochs', nargs="+", type=int, default=[-1],
+                            help='Which epoch we fill the batches according to scores')
+        parser.add_argument('--fixedbsize-policy', type=str, default="original",
+                            help='Policy of the fixed batch size. By default it sorts using the score '
+                            'Possible values: (original, combined)')
+        parser.add_argument('--window-end', type=int, default="-1",
+                            help='At which epoch the window reaches the end of every batches')
+        parser.add_argument('--seed-shuffle', type=int, default=141,
+                            help='Seed for the shuffle batch. Default is the one we always use.')
+        parser.add_argument('--reverse-score', action="store_true",
+                            help="Instead of selecting higher is better, selects lower is better")
+        parser.add_argument('--shuffle-chunks', type=int, default=-1,
+                            help="Shuffles the train tokens by N chunks")
+        parser.add_argument('--shuffle-chunks-size', type=int, default=-1,
+                            help="Shuffles the train tokens by chunks of N size")
+        parser.add_argument('--embed-func', type=str, default='original',
+                            help="Type of embedding function used", choices=['original', 'mmul'])
+        parser.add_argument('--save-grad', action="store_true",
+                            help="Saves the grd wrt to the input.")
+        parser.add_argument('--save-gradPure', action="store_true",
+                            help="Saves the grad wrt to the input but backwarding the output, not the loss.")
+        parser.add_argument("--grad-interval", type=int, default=20,
+                            help="Which epoch interval we save the grads.")
 
         args = parser.parse_args()
         return args
@@ -120,15 +229,14 @@ class MOS:
 
     def init_args(self):
         parser = argparse.ArgumentParser(
-            description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model')
+            description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model',
+            conflict_handler='resolve')
         add_common_args(parser, "mos")
         parser.add_argument('--model', type=str, default='LSTM',
                             help='type of recurrent net '
                             '(RNN_TANH, RNN_RELU, LSTM, GRU, SRU)')
         parser.add_argument('--nhidlast', type=int, default=-1,
                             help='number of hidden units for the last rnn layer')
-        parser.add_argument('--clip', type=float, default=0.25,
-                            help='gradient clipping')
 
         parser.add_argument('--dropout', type=float, default=0.4,
                             help='dropout applied to layers (0 = no dropout)')
@@ -184,3 +292,5 @@ if __name__ == "__main__":
         from simple import main
     elif args.main_model == "mos-lstm":
         from mos import main
+    elif args.main_model == "awd-lstm":
+        from awd import main

@@ -104,3 +104,4 @@ data/*
 logs/
 
 .DS_Store
+/*.data
