@@ -38,6 +38,8 @@ ds = launcher.ds
 # Stats Keeper
 sk = launcher.sk
 
+train_seq = launcher.train_seq
+
 # Check if --save-grad and --embed-func == mmul
 if args.save_grad and args.embed_func != "mmul":
     raise Exception(f"To use '--save-grad' '--embed-func' needs to be 'mmul'")
