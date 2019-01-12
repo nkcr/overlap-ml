@@ -42,65 +42,6 @@ sk = launcher.sk
 if args.save_grad and args.embed_func != "mmul":
     raise Exception(f"To use '--save-grad' '--embed-func' needs to be 'mmul'")
 
-# Init seq
-if args.init_seq == "original":
-    ds.current_seq = ds.manual_seq(args.batch_size)
-elif args.init_seq == "one":
-    ds.current_seq = ds.manual_seq(1)
-elif args.init_seq.startswith("overlap_"):
-    overlap = int(args.init_seq.split("_")[1])
-    if args.bptt % overlap != 0:
-        raise Exception(f"overlap must divide '--bptt' (found {overlap})")
-    ds.current_seq = ds.overlap_seq(args.batch_size, overlap)
-elif args.init_seq.startswith("overlapC_"):
-    overlap = int(args.init_seq.split("_")[1])
-    if args.bptt % overlap != 0:
-        raise Exception(f"overlapC must divide '--bptt' (found {overlap})")
-    ds.current_seq = ds.overlap_c_seq(args.batch_size, overlap)
-elif args.init_seq.startswith("overlapCP_"):
-    overlap = int(args.init_seq.split("_")[1])
-    if args.bptt % overlap != 0:
-        raise Exception(f"overlapCP must divide '--bptt' (found {overlap})")
-    ds.current_seq = ds.overlap_cp_seq(args.batch_size, overlap)
-elif args.init_seq.startswith("overlapCR_"):
-    overlap = int(args.init_seq.split("_")[1])
-    if args.bptt % overlap != 0:
-        raise Exception(f"overlapCR must divide '--bptt' (found {overlap})")
-    ds.current_seq = ds.overlap_cr_seq(args.batch_size, overlap)
-elif args.init_seq.startswith("overlapCF_"):
-    overlap = int(args.init_seq.split("_")[1])
-    if args.bptt % overlap != 0:
-        raise Exception(f"overlapCF must divide '--bptt' (found {overlap})")
-    ds.current_seq = ds.overlap_cf_seq(args.batch_size, overlap)
-elif args.init_seq.startswith("rotate_"):
-    offset = int(args.init_seq.split("_")[1])
-    ds.current_seq = ds.rotate_seq(args.batch_size, offset)
-elif args.init_seq == "random_rotate":
-    ds.current_seq = ds.random_rotate_seq(args.batch_size)
-elif args.init_seq == "transposed":
-    ds.current_seq = ds.transposed_seq(args.batch_size)
-else:
-    raise Exception(f"init-seq unkown: {args.init_seq}")
-
-# Type of train_seq
-if args.train_seq == "original":
-    train_seq = ds.train_seq
-elif args.train_seq == "random":
-    train_seq = ds.random_train_seq
-elif args.train_seq.startswith("window_"):
-    window_proportion = int(args.train_seq.split("_")[1])
-
-    def train_seq(): return ds.window_train_seq(window_proportion)  # nopep8 no-E731
-    if args.window_end == -1:
-        raise Exception("--window-end must be provided "
-                        "when using --train-seq window")
-elif args.train_seq.startswith("repeat_"):
-    n = int(args.train_seq.split("_")[1])
-
-    def train_seq(): return ds.repeated_train_seq(n)  # nopep8 no-E731
-else:
-    raise Exception(f"train-seq unkown: {args.train_seq}")
-
 # Type of embedding function used
 if args.embed_func == "original":
     embed_func = nn.functional.embedding
