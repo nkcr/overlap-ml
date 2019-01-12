@@ -15,6 +15,8 @@ def add_common_args(parser, model_name):
     # Data, seed
     parser.add_argument('--seed', type=int, default=1111,
                         help='random seed')
+    parser.add_argument('--seed-shuffle', type=int, default=141,
+                        help='Seed for the batch shuffling.')
     parser.add_argument('--data', type=str, default='data/penn/',
                         help='location of the data corpus')
     parser.add_argument('--emsize', type=int, default=400,
@@ -73,6 +75,16 @@ def add_common_args(parser, model_name):
                         'folder if relative, else to the absolute path plus '
                         'the model id.')
 
+    # Train seq shuffling
+    parser.add_argument('--shuffle-row-seq', action="store_true",
+                        help="Shuffles the ds.train_seq row-wise before training")
+    parser.add_argument('--shuffle-col-seq', action="store_true",
+                        help="Shuffles the ds.train_seq column-wise before training")
+    parser.add_argument('--shuffle-each-row-seq', action="store_true",
+                        help="Shuffles the ds.train_seq for each row individually")
+    parser.add_argument('--shuffle-full-seq', action="store_true",
+                        help="Shuffles the ds.train_seq row and column wise (complete)")
+
 
 def common_init(that):
     that.args = that.init_args()
@@ -92,6 +104,15 @@ def common_init(that):
     that.tb = TensorBoard(that.args.model_dir)
     that.ds = DataSelector(that.args)
     that.sk = StatsKeeper(that.args, that.args.stat_folder)
+
+    if that.args.shuffle_row_seq:
+        that.ds.shuffle_row_train_seq()
+    if that.args.shuffle_col_seq:
+        that.ds.shuffle_col_train_seq()
+    if that.args.shuffle_each_row_seq:
+        that.ds.shuffle_each_row_train_seq()
+    if that.args.shuffle_full_seq:
+        that.ds.shuffle_full_train_seq()
 
     # Init seq
     if that.args.init_seq == "original":
@@ -183,14 +204,7 @@ class AWD:
                             help='Which ds.train_seq method to use (original, random, window_N, repeat_N')
         parser.add_argument('--get-priors', action="store_true",
                             help="Computes loss of each batch")
-        parser.add_argument('--shuffle-seq', action="store_true",
-                            help="Shuffles the ds.train_seq (row-wise) before training")
-        parser.add_argument('--shuffle2-seq', action="store_true",
-                            help="Shuffles the ds.train_seq (column-wise) before training")
-        parser.add_argument('--shuffle3-seq', action="store_true",
-                            help="Shuffles the ds.train_seq for each row individually")
-        parser.add_argument('--shuffle4-seq', action="store_true",
-                            help="Shuffles the ds.train_seq row and column wise (complete)")
+
         parser.add_argument('--update-random-rotate', action="store_true",
                             help="Rotates the current_seq randomly at each epoch using seed-shuffle")
         parser.add_argument('--fixedbsize-epochs', nargs="+", type=int, default=[-1],
@@ -200,8 +214,6 @@ class AWD:
                             'Possible values: (original, combined)')
         parser.add_argument('--window-end', type=int, default="-1",
                             help='At which epoch the window reaches the end of every batches')
-        parser.add_argument('--seed-shuffle', type=int, default=141,
-                            help='Seed for the shuffle batch. Default is the one we always use.')
         parser.add_argument('--reverse-score', action="store_true",
                             help="Instead of selecting higher is better, selects lower is better")
         parser.add_argument('--shuffle-chunks', type=int, default=-1,

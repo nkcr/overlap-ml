@@ -351,15 +351,6 @@ try:
         optimizer = torch.optim.Adam(
             params, lr=args.lr, weight_decay=args.wdecay)
 
-    if args.shuffle_seq:
-        ds.shuffle_train_seq()
-    if args.shuffle2_seq:
-        ds.shuffle2_train_seq()
-    if args.shuffle3_seq:
-        ds.shuffle3_train_seq()
-    if args.shuffle4_seq:
-        ds.shuffle4_train_seq()
-
     if args.get_priors:
         logger.info("Computing priors")
         loss = evaluate_scores(1, ds.batch_size)

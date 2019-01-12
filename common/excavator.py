@@ -100,6 +100,14 @@ class DataSelector:
         target = Variable(source[i+1:i+1+seq_len])
         return data, target
 
+    def get_or_create_rstate(self):
+        """rstate is Random State, which is used to have a separate random
+        state for shuffling
+        """
+        if not hasattr(self, "rstate"):
+            self.rstate = np.random.RandomState(self.args.seed_shuffle)
+        return self.rstate
+
     # ________________________________________________________________________
     # Train seq iterator
 
@@ -204,3 +212,35 @@ class DataSelector:
         self.nitems = ndatapoints
         self.b2d = self.init_b2d_overlap(overlap)
         return item_idx.tolist()
+
+    # ________________________________________________________________________
+    # Train seq update
+
+    def shuffle_row_train_seq(self):
+        self.logger.info("(excavator) Shuffe row (row-wise) train_seq")
+        rstate = self.get_or_create_rstate()
+        rstate.shuffle(self.current_seq)
+
+    def shuffle_col_train_seq(self):
+        self.logger.info("(excavator) Shuffle col (column-wise) train_seq")
+        rstate = self.get_or_create_rstate()
+        temp = np.array(self.current_seq)
+        rstate.shuffle(temp.T)
+        self.current_seq = temp.tolist()
+
+    def shuffle_each_row_train_seq(self):
+        self.logger.info("(excavator) Shuffle each row "
+                         "(row individually) train_seq")
+        rstate = self.get_or_create_rstate()
+        temp = np.array(self.current_seq)
+        np.apply_along_axis(rstate.shuffle, 1, temp)
+        self.current_seq = temp.tolist()
+
+    def shuffle_full_train_seq(self):
+        self.logger.info("(excavator) Shuffle full (row+col wise) train_seq")
+        rstate = self.get_or_create_rstate()
+        temp = np.array(self.current_seq)
+        shape = temp.shape
+        temp = temp.reshape(-1)
+        rstate.shuffle(temp)
+        self.current_seq = temp.reshape(shape).tolist()
