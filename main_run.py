@@ -119,21 +119,21 @@ def common_init(that):
         raise Exception(f"init-seq unkown: {that.args.init_seq}")
 
     # Type of train_seq
-    if args.train_seq == "original":
-        that.train_seq = ds.train_seq
-    elif args.train_seq == "random":
-        that.train_seq = ds.random_train_seq
-    elif args.train_seq.startswith("window_"):
-        window_proportion = int(args.train_seq.split("_")[1])
-        that.train_seq = lambda: ds.window_train_seq(window_proportion)
-        if args.window_end == -1:
+    if that.args.train_seq == "original":
+        that.train_seq = that.ds.train_seq
+    elif that.args.train_seq == "random":
+        that.train_seq = that.ds.random_train_seq
+    elif that.args.train_seq.startswith("window_"):
+        window_proportion = int(that.args.train_seq.split("_")[1])
+        that.train_seq = lambda: that.ds.window_train_seq(window_proportion)
+        if that.args.window_end == -1:
             raise Exception("--window-end must be provided "
                             "when using --train-seq window")
-    elif args.train_seq.startswith("repeat_"):
-        n = int(args.train_seq.split("_")[1])
-        that.train_seq = lambda: ds.repeated_train_seq(n)
+    elif that.args.train_seq.startswith("repeat_"):
+        n = int(that.args.train_seq.split("_")[1])
+        that.train_seq = lambda: that.ds.repeated_train_seq(n)
     else:
-        raise Exception(f"train-seq unkown: {args.train_seq}")
+        raise Exception(f"train-seq unkown: {that.args.train_seq}")
 
     if that.args.shuffle_row_seq:
         that.ds.shuffle_row_train_seq()
