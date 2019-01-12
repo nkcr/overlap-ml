@@ -105,15 +105,6 @@ def common_init(that):
     that.ds = DataSelector(that.args)
     that.sk = StatsKeeper(that.args, that.args.stat_folder)
 
-    if that.args.shuffle_row_seq:
-        that.ds.shuffle_row_train_seq()
-    if that.args.shuffle_col_seq:
-        that.ds.shuffle_col_train_seq()
-    if that.args.shuffle_each_row_seq:
-        that.ds.shuffle_each_row_train_seq()
-    if that.args.shuffle_full_seq:
-        that.ds.shuffle_full_train_seq()
-
     # Init seq
     if that.args.init_seq == "original":
         # Done by default in DataSelector initialization
@@ -126,6 +117,15 @@ def common_init(that):
             that.args.batch_size, overlap)
     else:
         raise Exception(f"init-seq unkown: {that.args.init_seq}")
+
+    if that.args.shuffle_row_seq:
+        that.ds.shuffle_row_train_seq()
+    if that.args.shuffle_col_seq:
+        that.ds.shuffle_col_train_seq()
+    if that.args.shuffle_each_row_seq:
+        that.ds.shuffle_each_row_train_seq()
+    if that.args.shuffle_full_seq:
+        that.ds.shuffle_full_train_seq()
 
 
 class Simple:
