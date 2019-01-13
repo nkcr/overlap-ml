@@ -87,6 +87,20 @@ def add_common_args(parser, model_name):
 
 
 def common_init(that):
+    """Common initialization of our models. Here is the check list:
+
+        - [√] Parse the input arguments
+        - [√] Create necessary folders to save data
+        - [√] Set a logger to be used and save the output 
+        - [√] Set manual seeds to make results reproductible
+        - [√] Init the correct device to be used by pytorch: cpu or cuda:id
+        - [√] Save the input arguments used
+        - [√] Save the git infos: commit id, repo origin
+        - [√] Set a tensorboard object to record stats
+        - [√] Set a DataSelector object which handles data samples
+        - [√] Set a StatKeeper object which can save arbitrary stats
+        - [√] Perform specific initializations based on input params
+    """
     that.args = that.init_args()
 
     if that.args.continue_train and that.args.model_dir is None:
@@ -135,6 +149,7 @@ def common_init(that):
     else:
         raise Exception(f"train-seq unkown: {that.args.train_seq}")
 
+    # Shuffling of the train_seq
     if that.args.shuffle_row_seq:
         that.ds.shuffle_row_train_seq()
     if that.args.shuffle_col_seq:
