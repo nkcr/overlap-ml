@@ -5,6 +5,7 @@ from common.utils import prepare_dir, get_logger, set_utils_logger, init_device,
 from common.excavator import DataSelector
 from common.oracle import StatsKeeper
 import time
+import random
 
 
 def add_common_args(parser, model_name):
@@ -111,6 +112,7 @@ def common_init(that):
     that.logger = get_logger(that.args)
     set_utils_logger(that.logger)
     np.random.seed(that.args.seed)
+    random.seed(that.args.seed)
     torch.manual_seed(that.args.seed)
     init_device(that.args)
     save_args(that.args)
