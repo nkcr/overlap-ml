@@ -1,5 +1,5 @@
-import awd.embedding_mul
 from common.excavator import DataSelector
+import awd.embedding_mul as embedding_mul
 from common.oracle import StatsKeeper
 from shutil import copyfile
 import torch.nn as nn
