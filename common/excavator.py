@@ -24,7 +24,7 @@ class DataSelector:
         self.args = args
         self.logger = get_logger(self.args)
 
-        data_hash = args.data.encode() + args.main_model.encode()
+        data_hash = (args.data + args.main_model).encode()
         fn = 'corpus.{}.data'.format(
             hashlib.md5(data_hash).hexdigest())
         if os.path.exists(fn):
