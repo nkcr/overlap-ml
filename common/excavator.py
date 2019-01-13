@@ -2,20 +2,27 @@ from common import data
 from common.utils import get_logger
 from torch.autograd import Variable
 import numpy as np
-import random
 import hashlib
 import os
 import torch
 
+"""Contains the DataSelector class, which is used by the models.
+
+Author: Noémien Kocher
+Date: Fall 2018
+Unit test: excavator_test.py
+"""
+
 
 class DataSelector:
-    """This class is responsible for all the transactions with the datasets.
+    """This class is responsible for all the transactions with the
+    datasets. It is espacially used as an attempt to perform better
+    datas election on the training set.
     """
 
     def __init__(self, args):
         self.args = args
         self.logger = get_logger(self.args)
-        random.seed(args.seed_shuffle)
 
         data_hash = args.data.encode() + args.main_model.encode()
         fn = 'corpus.{}.data'.format(
