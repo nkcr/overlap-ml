@@ -85,8 +85,9 @@ class DataSelector:
 
     def init_b2d_overlap(self, overlap):
         assert self.args.bptt % overlap == 0, "overlap must divide bptt"
-        jump = self.args.bptt // overlap
-        return [i*jump for i in range(self.nitems)]
+        shift = self.args.bptt // overlap
+        # +1 is for the target token
+        return [i*shift for i in range(self.nitems+1)]
 
     def batchify(self, data, bsz):
         # Work out how cleanly we can divide the dataset into bsz parts.
@@ -207,18 +208,32 @@ class DataSelector:
            6  2          2  5
         """
         dsize = self.train_data.size(0)
-        ndatapoints = sum([(dsize-i*(self.args.bptt//overlap)) //
-                           self.args.bptt for i in range(overlap)])
-        result = []
-        for i in range(overlap):
-            for j in range(ndatapoints//overlap):
-                result.append(i+j*overlap)
-        item_idx = np.array(result[:len(result)-len(result) % bsize])
-        nbatch = item_idx.size // bsize
-        item_idx = item_idx.reshape(bsize, nbatch).T
+        shift = self.args.bptt // overlap
+        # ndatapoints = sum([(dsize-i*shift) // self.args.bptt
+        #                    for i in range(overlap)])
+        # result = []
+        # for i in range(overlap):
+        #     for j in range(ndatapoints//overlap):
+        #         result.append(i+j*overlap)
+        # item_idx = np.array(result[:len(result)-len(result) % bsize])
+        # nbatch = item_idx.size // bsize
+        # item_idx = item_idx.reshape(bsize, nbatch).T
+        # self.nitems = ndatapoints
+        # self.b2d = self.init_b2d_overlap(overlap)
+
+        len_sub_seq = dsize // self.args.bptt
+        dp_seq = np.array(range(overlap*len_sub_seq)
+                          ).reshape(len_sub_seq, overlap)
+        dp_seq = dp_seq.T.reshape(-1)
+        dp_seq = dp_seq[(dp_seq*shift+self.args.bptt) < dsize]
+
+        dp_seq = dp_seq[:len(dp_seq)-len(dp_seq) % bsize]
+        ndatapoints = dp_seq.size
+        nbatch = ndatapoints // bsize
+        dp_seq = dp_seq.reshape(bsize, nbatch).T
         self.nitems = ndatapoints
         self.b2d = self.init_b2d_overlap(overlap)
-        return item_idx.tolist()
+        return dp_seq.tolist()
 
     # ________________________________________________________________________
     # Train seq update
