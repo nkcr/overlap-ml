@@ -7,6 +7,23 @@ Hold experiments on 2 models using overlap:
 
 To specify which model to run, use `--main-model {simple-lstm | mos-lstm}`. There are additional common paramaters as well as specific parameters for each model. Those can be found in `main_run.py`.
 
+## Set up steps
+
+**1) Download the data**:
+
+```bash
+chmod +x get_data.sh
+./get_data.sh
+```
+
+***2) Install dependencies**:
+
+```bash
+python3.6 -m virtualenv venv
+source venv/bin/activate
+pip3 -r requirements.txt
+```
+
 ## Simple lstm
 
 ```bash
