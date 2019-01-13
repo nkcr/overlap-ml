@@ -25,7 +25,7 @@ class DataSelectorTest(unittest.TestCase):
         """
         self.that.train_data = torch.tensor(np.arange(0, 25)).view(-1, 1)
         self.that.args.bptt = 4
-        self.that.b2d = [0, 4, 8, 12, 16, 20]
+        self.that.b2d = lambda i: i*4
         self.that.current_seq = [[0, 2], [1, 4]]
 
         expected_data = []
@@ -71,7 +71,7 @@ class DataSelectorTest(unittest.TestCase):
         self.that.train_data = torch.tensor(np.arange(0, 25)).view(-1, 1)
         self.that.args.bptt = 4
         self.that.nitems = 6
-        self.that.b2d = [0, 4, 8, 12, 16, 20]
+        self.that.b2d = lambda i: i*4
         self.that.current_seq = [[0, 2], [1, 4]]
 
         expected = [[0, 2, 4], [1, 3, 5]]
@@ -89,7 +89,7 @@ class DataSelectorTest(unittest.TestCase):
         self.that.train_data = torch.tensor(np.arange(0, 25)).view(-1, 1)
         self.that.args.bptt = 4
         self.that.nitems = 6
-        self.that.b2d = [0, 4, 8, 12, 16, 20]
+        self.that.b2d = lambda i: i*4
         self.that.current_seq = DataSelector.manual_seq(self.that, 3)
         expected_data = []
         expected_target = []

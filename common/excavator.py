@@ -50,7 +50,7 @@ class DataSelector:
 
         # batch id to data id
         # here we forget the last chunk of data not multiple of bptt
-        self.b2d = self.init_b2d()
+        self.b2d = lambda i: i*self.args.bptt
 
         # this list holds the idx of datapoints for each batch
         self._current_seq = self.manual_seq(args.batch_size)
@@ -79,15 +79,6 @@ class DataSelector:
 
     # ________________________________________________________________________
     # Utility / Initializations
-
-    def init_b2d(self):
-        return [i*self.args.bptt for i in range(self.nitems)]
-
-    def init_b2d_overlap(self, overlap):
-        assert self.args.bptt % overlap == 0, "overlap must divide bptt"
-        shift = self.args.bptt // overlap
-        # +1 is for the target token
-        return [i*shift for i in range(self.nitems+1)]
 
     def batchify(self, data, bsz):
         # Work out how cleanly we can divide the dataset into bsz parts.
@@ -137,9 +128,9 @@ class DataSelector:
         bptt = self.args.bptt
         for batches_id in self.current_seq:
             data = self.train_data[[i for k in batches_id for i in np.arange(
-                self.b2d[k], self.b2d[k] + bptt)]]
+                self.b2d(k), self.b2d(k) + bptt)]]
             target = self.train_data[[i for k in batches_id for i in np.arange(
-                self.b2d[k]+1, self.b2d[k]+1 + bptt)]]
+                self.b2d(k)+1, self.b2d(k)+1 + bptt)]]
             yield data.view(-1, bptt).t().contiguous(), \
                 target.view(-1, bptt).t().contiguous()
 
@@ -232,7 +223,7 @@ class DataSelector:
         nbatch = ndatapoints // bsize
         dp_seq = dp_seq.reshape(bsize, nbatch).T
         self.nitems = ndatapoints
-        self.b2d = self.init_b2d_overlap(overlap)
+        self.b2d = lambda i: i*shift
         return dp_seq.tolist()
 
     # ________________________________________________________________________
