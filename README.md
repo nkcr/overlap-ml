@@ -21,7 +21,7 @@ chmod +x get_data.sh
 ```bash
 python3.6 -m virtualenv venv
 source venv/bin/activate
-pip3 -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## Simple lstm
