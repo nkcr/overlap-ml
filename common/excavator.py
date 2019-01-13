@@ -103,9 +103,9 @@ class DataSelector:
         """Legacy method"""
         seq_len = min(seq_len if seq_len else self.args.bptt,
                       len(source) - 1 - i)
-        data = Variable(source[i:i+seq_len])
+        data = source[i:i+seq_len]
         # target = Variable(source[i+1:i+1+seq_len].view(-1))
-        target = Variable(source[i+1:i+1+seq_len])
+        target = source[i+1:i+1+seq_len]
         return data, target
 
     def get_or_create_rstate(self):
