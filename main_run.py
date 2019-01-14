@@ -137,7 +137,7 @@ def common_init(that):
         if that.args.bptt % overlap != 0:
             raise Exception(
                 f"overlapCN must divide '--bptt' (found {overlap})")
-        that.ds.current_seq = that.ds.overlap_cN_seq(
+        that.ds.current_seq = that.ds.overlap_cn_seq(
             that.args.batch_size, overlap)
     else:
         raise Exception(f"init-seq unkown: {that.args.init_seq}")
