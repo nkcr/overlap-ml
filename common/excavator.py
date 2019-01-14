@@ -193,16 +193,6 @@ class DataSelector:
         """
         dsize = self.train_data.size(0)
         shift = self.args.bptt // overlap
-        # ndatapoints = sum([(dsize-i*shift) // self.args.bptt
-        #                    for i in range(overlap)])
-        # result = []
-        # for i in range(overlap):
-        #     for j in range(ndatapoints//overlap):
-        #         result.append(i+j*overlap)
-        # item_idx = np.array(result[:len(result)-len(result) % bsize])
-        # nbatch = item_idx.size // bsize
-        # item_idx = item_idx.reshape(bsize, nbatch).T
-        # self.b2d = self.init_b2d_overlap(overlap)
 
         len_sub_seq = dsize // self.args.bptt
         dp_seq = np.array(range(overlap*len_sub_seq)
@@ -215,6 +205,45 @@ class DataSelector:
         dp_seq = dp_seq[:len(dp_seq)-len(dp_seq) % bsize]
         ndatapoints = dp_seq.size
         nbatch = ndatapoints // bsize
+        dp_seq = dp_seq.reshape(bsize, nbatch).T
+        self.b2d = lambda i: i*shift
+        return dp_seq
+
+    def overlap_cn_seq(self, bsize, overlap):
+        """Variant of the overlap sequence, with contiguous normalized sequence.
+
+        The normalized version uses the same lenght for every sub-sequences.
+        Here is a version without normalization:
+
+                |-----2-----|-----5-----|
+            |-----1-----|-----4-----|
+        |-----0-----|-----3-----|-----6-----|
+         a b c d e f g h i j k l m n o p q r
+
+        And here is the normalized version:
+
+                |-----2-----|-----5-----|
+            |-----1-----|-----4-----|
+        |-----0-----|-----3-----|
+         a b c d e f g h i j k l m n o p q r
+
+        Which yields the following train_seq for a batch size of 2:
+
+        contiguous      contiguous normalized
+           0  1          0  4
+           3  4          3  2
+           6  2          1  5
+        """
+        dsize = self.train_data.size(0)
+        shift = self.args.bptt // overlap
+        ndatapoints = sum([(dsize-i*shift) // self.args.bptt
+                           for i in range(overlap)])
+        result = []
+        for i in range(overlap):
+            for j in range(ndatapoints//overlap):
+                result.append(i+j*overlap)
+        dp_seq = np.array(result[:len(result)-len(result) % bsize])
+        nbatch = dp_seq.size // bsize
         dp_seq = dp_seq.reshape(bsize, nbatch).T
         self.b2d = lambda i: i*shift
         return dp_seq

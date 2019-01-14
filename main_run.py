@@ -69,7 +69,8 @@ def add_common_args(parser, model_name):
     # Data selection
     parser.add_argument('--init-seq', type=str, default="original",
                         help='Initialization of the ds.current_seq '
-                        '(original, overlapC_N (contiguous)')
+                        '(original, overlapC_N (contiguous), '
+                        'overlapCN_N (contiguous normalized')
 
     parser.add_argument('--stat-folder', type=str, default="stats/",
                         help='Folder to store the stats inside the log '
@@ -130,6 +131,13 @@ def common_init(that):
         if that.args.bptt % overlap != 0:
             raise Exception(f"overlapC must divide '--bptt' (found {overlap})")
         that.ds.current_seq = that.ds.overlap_c_seq(
+            that.args.batch_size, overlap)
+    elif that.args.init_seq.startswith("overlapCN_"):
+        overlap = int(that.args.init_seq.split("_")[1])
+        if that.args.bptt % overlap != 0:
+            raise Exception(
+                f"overlapCN must divide '--bptt' (found {overlap})")
+        that.ds.current_seq = that.ds.overlap_cN_seq(
             that.args.batch_size, overlap)
     else:
         raise Exception(f"init-seq unkown: {that.args.init_seq}")
