@@ -76,14 +76,14 @@ class DataSelectorTest(unittest.TestCase):
 
         expected = [[0, 2, 4], [1, 3, 5]]
         seq = DataSelector.manual_seq(self.that, 3)
-        self.assertEqual(seq, expected)
+        self.assertEqual(seq.tolist(), expected)
 
         # Second test, with more data
         self.that.train_data = torch.tensor(np.arange(0, 40)).view(-1, 1)
         self.that.nitems = 10
         expected = [[0, 3, 6], [1, 4, 7], [2, 5, 8]]
         seq = DataSelector.manual_seq(self.that, 3)
-        self.assertEqual(seq, expected)
+        self.assertEqual(seq.tolist(), expected)
 
     def test_manuel_train_seq(self):
         self.that.train_data = torch.tensor(np.arange(0, 25)).view(-1, 1)
@@ -118,6 +118,35 @@ class DataSelectorTest(unittest.TestCase):
             self.assertEqual(
                 target.numpy().tolist(), expected_target[i])
 
+    def test_manuel_train_seq_2(self):
+        # Check for the safety of +1 target id
+        # In this case, we cannot have 6 datapoints, despite the fact that
+        # there is 24 tokens and bptt = 4. This is because the last datapoint
+        # need to know its next last token. If we had 6 datapoints, the last
+        # datapoint would look for the 25th token, which is out of bound.
+        self.that.train_data = torch.tensor(np.arange(0, 24)).view(-1, 1)
+        self.that.args.bptt = 4
+        bsize = 3
+        self.that.b2d = lambda i: i*4
+        self.that.current_seq = DataSelector.manual_seq(self.that, bsize)
+        expected_data = []
+        expected_target = []
+        expected_data.append([
+            [0, 4, 8],
+            [1, 5, 9],
+            [2, 6, 10],
+            [3, 7, 11]
+        ])
+        expected_target.append([
+            [1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]
+        ])
+        seq = DataSelector.train_seq(self.that)
+        for i, (data, target) in enumerate(seq):
+            self.assertEqual(
+                data.numpy().tolist(), expected_data[i])
+            self.assertEqual(
+                target.numpy().tolist(), expected_target[i])
+
     def test_overlap_c_seq(self):
         train_data = torch.tensor(np.arange(0, 25)).view(-1, 1)
         batch_size = 6
@@ -133,8 +162,7 @@ class DataSelectorTest(unittest.TestCase):
         self.that.train_data = train_data
         self.that.args.bptt = bptt
         result = DataSelector.overlap_c_seq(self.that, batch_size, overlap)
-        self.assertEqual(result, expected)
-        self.assertEqual(self.that.nitems, 6)
+        self.assertEqual(result.tolist(), expected)
 
         batch_size = 4
         bptt = 4
@@ -147,8 +175,7 @@ class DataSelectorTest(unittest.TestCase):
         ]
         self.that.args.bptt = bptt
         result = DataSelector.overlap_c_seq(self.that, batch_size, overlap)
-        self.assertEqual(result, expected)
-        self.assertEqual(self.that.nitems, 8)
+        self.assertEqual(result.tolist(), expected)
 
         batch_size = 4
         bptt = 4
@@ -164,8 +191,7 @@ class DataSelectorTest(unittest.TestCase):
         ]
         self.that.args.bptt = bptt
         result = DataSelector.overlap_c_seq(self.that, batch_size, overlap)
-        self.assertEqual(result, expected)
-        self.assertEqual(self.that.nitems, 20)
+        self.assertEqual(result.tolist(), expected)
 
 
 if __name__ == "__main__":
