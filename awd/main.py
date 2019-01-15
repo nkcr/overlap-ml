@@ -12,13 +12,9 @@ import math
 import sys
 import os
 
-import awd.model
-import common.data
 from main_run import AWD
 
-from common.utils import batchify, repackage_hidden, init_device, \
-    prepare_dir, save_commit_id, save_args, save_tb, TensorBoard, get_logger, \
-    set_utils_logger, save_hist
+from common.utils import repackage_hidden, save_tb, save_hist
 
 launcher = AWD()
 
@@ -151,6 +147,7 @@ def evaluate_scores(epoch, batch_size):
     ntokens = ds.ntokens
     hidden = model.init_hidden(batch_size)
     for data, targets in ds.train_seq():
+        targets = targets.view(-1).contiguous()
         output, hidden = model(data, hidden)
         loss = criterion(model.decoder.weight,
                          model.decoder.bias, output, targets).data
