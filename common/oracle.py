@@ -94,6 +94,8 @@ class StatsKeeper():
 
     def save_seq(self, seq):
         """Saves the sequence as JSON, referenced by the epoch"""
+        if type(seq) is np.ndarray:
+            seq = seq.tolist()
         data_path = os.path.join(self.path, f"epoch_{self.epoch}_seq.json")
         # np.save(data_path, np.array(seq))
         with open(data_path, 'w') as outfile:
