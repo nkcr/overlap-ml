@@ -16,12 +16,12 @@ logger = None
 
 
 def repackage_hidden(h):
-    """Wraps hidden states in new Variables, to detach them from their history.
-    """
-    if isinstance(h, tuple) or isinstance(h, list):
-        return tuple(repackage_hidden(v) for v in h)
-    else:
+    """Wraps hidden states in new Tensors,
+    to detach them from their history."""
+    if isinstance(h, torch.Tensor):
         return h.detach()
+    else:
+        return tuple(repackage_hidden(v) for v in h)
 
 
 def batchify(data, bsz, args):
