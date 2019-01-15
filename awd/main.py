@@ -12,6 +12,7 @@ import math
 import sys
 import os
 
+import awd.model as model
 from main_run import AWD
 
 from common.utils import repackage_hidden, save_tb, save_hist
@@ -76,9 +77,9 @@ from awd.splitcross import SplitCrossEntropyLoss
 criterion = None
 
 ntokens = ds.ntokens
-model = awd.model.RNNModel(args.model, ntokens, args.emsize, args.nhid, args.nlayers,
-                           args.dropout, args.dropouth, args.dropouti, args.dropoute,
-                           args.wdrop, args.tied, embed_func)
+model = model.RNNModel(args.model, ntokens, args.emsize, args.nhid, args.nlayers,
+                       args.dropout, args.dropouth, args.dropouti, args.dropoute,
+                       args.wdrop, args.tied, embed_func)
 ###
 if args.resume:
     logger.info('Resuming model ...')
