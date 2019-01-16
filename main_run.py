@@ -71,7 +71,9 @@ def add_common_args(parser, model_name):
                         help='Initialization of the ds.current_seq '
                         '(original, overlapC_N (contiguous), '
                         'overlapCN_N (contiguous normalized')
-
+    parser.add_argument('--train-seq', type=str, default="original",
+                        help='Which ds.train_seq method to use '
+                        '(original, repeat_N')
     parser.add_argument('--stat-folder', type=str, default="stats/",
                         help='Folder to store the stats inside the log '
                         'folder if relative, else to the absolute path plus '
@@ -145,14 +147,6 @@ def common_init(that):
     # Type of train_seq
     if that.args.train_seq == "original":
         that.train_seq = that.ds.train_seq
-    elif that.args.train_seq == "random":
-        that.train_seq = that.ds.random_train_seq
-    elif that.args.train_seq.startswith("window_"):
-        window_proportion = int(that.args.train_seq.split("_")[1])
-        that.train_seq = lambda: that.ds.window_train_seq(window_proportion)
-        if that.args.window_end == -1:
-            raise Exception("--window-end must be provided "
-                            "when using --train-seq window")
     elif that.args.train_seq.startswith("repeat_"):
         n = int(that.args.train_seq.split("_")[1])
         that.train_seq = lambda: that.ds.repeated_train_seq(n)
@@ -179,7 +173,7 @@ class Simple:
     def init_args(self):
         parser = argparse.ArgumentParser(
             description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model',
-            conflict_handler='resolve')
+            conflict_handler='resolve', allow_abbrev=False)
         add_common_args(parser, "simple")
 
         args = parser.parse_args()
@@ -195,7 +189,7 @@ class AWD:
     def init_args(self):
         parser = argparse.ArgumentParser(
             description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model',
-            conflict_handler='resolve')
+            conflict_handler='resolve', allow_abbrev=False)
 
         add_common_args(parser, "awd")
 
@@ -242,8 +236,6 @@ class AWD:
                             '(original, one, overlap_2, overlapC_2 (contiguous), '
                             'overlapCP_2 (contiguous-pruned), overlapCR_2 (contiguous-row), '
                             'overlapCF_2 (contiguous-fake), rotate_2, random_rotate, transposed')
-        parser.add_argument('--train-seq', type=str, default="original",
-                            help='Which ds.train_seq method to use (original, random, window_N, repeat_N')
         parser.add_argument('--get-priors', action="store_true",
                             help="Computes loss of each batch")
 
@@ -284,7 +276,7 @@ class MOS:
     def init_args(self):
         parser = argparse.ArgumentParser(
             description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model',
-            conflict_handler='resolve')
+            conflict_handler='resolve', allow_abbrev=False)
         add_common_args(parser, "mos")
         parser.add_argument('--model', type=str, default='LSTM',
                             help='type of recurrent net '
