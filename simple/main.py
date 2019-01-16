@@ -136,6 +136,7 @@ def train():
             start_time = time.time()
 
         batch += 1
+        tot_steps += 1
 
 
 best_val_loss = []
