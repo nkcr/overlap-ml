@@ -7,14 +7,16 @@ import time
 from common.utils import save_tb, save_checkpoint, repackage_hidden
 import os
 
-simple = Simple()
-args = simple.args
+launcher = Simple()
+args = launcher.args
 
-logger = simple.logger
+logger = launcher.logger
 # Tensorboard
-tb = simple.tb
+tb = launcher.tb
 # DataSelector
-ds = simple.ds
+ds = launcher.ds
+
+train_seq = launcher.train_seq
 
 
 class SimpleLSTM(nn.Module):
