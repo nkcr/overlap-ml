@@ -176,7 +176,7 @@ class Simple:
             conflict_handler='resolve', allow_abbrev=False)
         add_common_args(parser, "simple")
 
-        parser.add_argument('dropout', type=float,
+        parser.add_argument('--dropout', type=float,
                             default=0.35, help="Probability to keep")
 
         args = parser.parse_args()
