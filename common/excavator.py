@@ -266,4 +266,7 @@ class DataSelector:
 
     def shuffle_full_train_seq(self):
         self.logger.info("(excavator) Shuffle full (row+col wise) train_seq")
-        self.rstate.shuffle(self.current_seq.reshape(-1))
+        shape = self.current_seq.shape
+        self.current_seq = self.current_seq.reshape(-1)
+        self.rstate.shuffle(self.current_seq)
+        self.current_seq = self.current_seq.reshape(shape)

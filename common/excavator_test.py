@@ -239,6 +239,37 @@ class DataSelectorTest(unittest.TestCase):
         result = DataSelector.overlap_cn_seq(self.that, batch_size, overlap)
         self.assertEqual(result.tolist(), expected)
 
+    def test_shuffle(self):
+        self.that.rstate = np.random.RandomState(1)
+        basic = np.array(range(24)).reshape(6, 4)
+        self.that.current_seq = np.copy(basic)
+        print("\n" + "-"*70)
+
+        print("Basic train_seq:")
+        print(self.that.current_seq)
+
+        print("Expect to have rows shuffled:")
+        self.that.current_seq = np.copy(basic)
+        DataSelector.shuffle_row_train_seq(self.that)
+        print(self.that.current_seq)
+
+        print("Expect to have cols shuffled:")
+        self.that.current_seq = np.copy(basic)
+        DataSelector.shuffle_col_train_seq(self.that)
+        print(self.that.current_seq)
+
+        print("Expect to have each row shuffled:")
+        self.that.current_seq = np.copy(basic)
+        DataSelector.shuffle_each_row_train_seq(self.that)
+        print(self.that.current_seq)
+
+        print("Expect to have full shuffling:")
+        self.that.current_seq = np.copy(basic)
+        DataSelector.shuffle_full_train_seq(self.that)
+        print(self.that.current_seq)
+
+        print("-"*70)
+
 
 if __name__ == "__main__":
     unittest.main()
