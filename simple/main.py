@@ -179,4 +179,6 @@ save_tb(tb, "test/ppl", 1, ppl)
 logger.info('=' * 89)
 logger.info('| End of training | test loss {:5.2f} | test ppl {:8.2f}'.format(
     test_loss, ppl))
+logger.info('| Best valid | valid loss {:5.2f} | valid ppl {:8.2f}').format(
+    stored_loss, math.exp(val_loss))
 logger.info('=' * 89)
