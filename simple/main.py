@@ -112,6 +112,7 @@ def train():
         output, hidden = model(data, hidden)
         loss = criterion(output.view(-1, output.size(2)), targets)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip)
         optimizer.step()
 
         total_loss += loss
