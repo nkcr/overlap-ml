@@ -25,12 +25,12 @@ class SimpleLSTM(nn.Module):
         self.args = args
         self.ntokens = ntokens
 
-        self.embedding = nn.Embedding(ntokens, args.emsize)
+        self.embedding = nn.Embedding(ntokens, args.nhid)
 
-        self.lstm = nn.LSTM(input_size=args.emsize,
-                            hidden_size=args.emsize, num_layers=args.nlayers)
+        self.lstm = nn.LSTM(input_size=args.nhid,
+                            hidden_size=args.nhid, num_layers=args.nlayers)
 
-        self.decoder = nn.Linear(args.emsize, ntokens)
+        self.decoder = nn.Linear(args.nhid, ntokens)
 
         self.init_weights()
 
@@ -45,16 +45,16 @@ class SimpleLSTM(nn.Module):
         # hidden is a tuple (h_0, c_0)
         data = self.embedding(data)
         output, hidden = self.lstm(data, hidden)
-        output = self.decoder(output.view(-1, self.args.emsize))
+        output = self.decoder(output.view(-1, self.args.nhid))
         output = output.view(-1, batch_size, self.ntokens)
         return output, hidden
 
     def init_hidden(self, batch_size):
         weight = next(self.parameters()).data
         return (torch.tensor(weight.new(self.args.nlayers, batch_size,
-                                        self.args.emsize).zero_()),
+                                        self.args.nhid).zero_()),
                 torch.tensor(weight.new(self.args.nlayers, batch_size,
-                                        self.args.emsize).zero_()))
+                                        self.args.nhid).zero_()))
 
 
 if args.continue_train:
