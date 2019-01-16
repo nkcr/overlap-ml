@@ -27,6 +27,8 @@ class SimpleLSTM(nn.Module):
 
         self.embedding = nn.Embedding(ntokens, args.nhid)
 
+        self.dropout = nn.Dropout(1 - self.args.dropout)
+
         self.lstm = nn.LSTM(input_size=args.nhid,
                             hidden_size=args.nhid, num_layers=args.nlayers)
 
@@ -45,6 +47,7 @@ class SimpleLSTM(nn.Module):
         # hidden is a tuple (h_0, c_0)
         data = self.embedding(data)
         output, hidden = self.lstm(data, hidden)
+        output = self.dropout(output)
         output = self.decoder(output.view(-1, self.args.nhid))
         output = output.view(-1, batch_size, self.ntokens)
         return output, hidden
