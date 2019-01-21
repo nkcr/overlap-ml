@@ -65,13 +65,13 @@ if args.continue_train:
     logger.info(f"Loading 'model.pt' at {args.model_dir}.")
     optimizer_state = torch.load(os.path.join(args.model_dir, 'optimizer.pt'))
     logger.info(f"Loading 'optimizer.pt' at {args.model_dir}.")
-    optimizer = torch.optim.SGD(
-        model.parameters(), lr=args.lr, weight_decay=args.wdecay)
+    optimizer = torch.optim.SGD(model.parameters(
+    ), lr=args.lr, weight_decay=args.wdecay, momentum=args.momentum)
     optimizer.load_state_dict(optimizer_state)
 else:
     model = SimpleLSTM(args, ds.ntokens)
-    optimizer = torch.optim.SGD(
-        model.parameters(), lr=args.lr, weight_decay=args.wdecay)
+    optimizer = torch.optim.SGD(model.parameters(
+    ), lr=args.lr, weight_decay=args.wdecay, momentum=args.momentum)
 
 criterion = nn.CrossEntropyLoss()
 

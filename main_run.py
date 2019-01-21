@@ -178,6 +178,8 @@ class Simple:
 
         parser.add_argument('--dropout', type=float,
                             default=0.35, help="Probability to keep")
+        parser.add_argument('--momentum', type=float,
+                            default=0.0, help="Momentum of the optimizer")
 
         args = parser.parse_args()
         return args
