@@ -180,6 +180,10 @@ class Simple:
                             default=0.35, help="Probability to keep")
         parser.add_argument('--momentum', type=float,
                             default=0.0, help="Momentum of the optimizer")
+        parser.add_argument('--lr-decay', type=float,
+                            default=0.87, help="Decay of learning rate")
+        parser.add_argument('--lr-decay-start', type=int,
+                            default=0, help="Epochs when lr decay starts")
 
         args = parser.parse_args()
         return args
