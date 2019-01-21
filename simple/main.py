@@ -148,6 +148,7 @@ try:
 
         lr_decay = args.lr_decay ** max(epoch+1 - args.lr_decay_start, 0)
         lr = lr * lr_decay
+        optimizer.param_groups[0]['lr'] = lr
 
         epoch_start_time = time.time()
         train()
