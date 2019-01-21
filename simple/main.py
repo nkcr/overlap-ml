@@ -45,7 +45,7 @@ class SimpleLSTM(nn.Module):
     def forward(self, data, hidden):
         batch_size = data.size(1)
         # hidden is a tuple (h_0, c_0)
-        data = self.embedding(data)
+        data = self.dropout(self.embedding(data))
         output, hidden = self.lstm(data, hidden)
         output = self.dropout(output)
         output = self.decoder(output.view(-1, self.args.nhid))
