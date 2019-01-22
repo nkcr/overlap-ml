@@ -184,6 +184,9 @@ class Simple:
                             default=0.87, help="Decay of learning rate")
         parser.add_argument('--lr-decay-start', type=int,
                             default=0, help="Epochs when lr decay starts")
+        parser.add_argument('--when', nargs="+", type=int, default=[-1],
+                            help='When(which epochs) to divide the learning '
+                            'rate by 10 - accepts multiple')
 
         args = parser.parse_args()
         return args
