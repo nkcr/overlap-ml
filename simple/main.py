@@ -141,14 +141,12 @@ def train():
 
 best_val_loss = []
 stored_loss = np.inf
-lr = optimizer.param_groups[0]['lr']
 
 try:
     for epoch in range(1, args.epochs+1):
 
         lr_decay = args.lr_decay ** max(epoch+1 - args.lr_decay_start, 0)
-        lr = lr * lr_decay
-        optimizer.param_groups[0]['lr'] = lr
+        optimizer.param_groups[0]['lr'] = args.lr * lr_decay
 
         epoch_start_time = time.time()
         train()
