@@ -148,6 +148,10 @@ try:
         lr_decay = args.lr_decay ** max(epoch+1 - args.lr_decay_start, 0)
         optimizer.param_groups[0]['lr'] = args.lr * lr_decay
 
+        if epoch in args.when:
+            logger.info("Dividing the loss by 10")
+            optimizer.param_groups[0]['lr'] /= 10
+
         epoch_start_time = time.time()
         train()
         epoch_time = time.time() - epoch_start_time
