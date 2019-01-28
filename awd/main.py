@@ -275,6 +275,13 @@ def train(epoch):
         tot_steps += 1
         i += 1
 
+        if tot_steps in args.when_steps:
+            logger.info(
+                '(when steps) Saving model before learning rate decreased')
+            model_save('{}.e{}'.format("model.pt", epoch))
+            logger.info('Dividing learning rate by 10')
+            optimizer.param_groups[0]['lr'] /= 10.
+
 
 # Loop over epochs.
 lr = args.lr
@@ -369,13 +376,6 @@ try:
 
             if epoch in args.when:
                 logger.info('Saving model before learning rate decreased')
-                model_save('{}.e{}'.format("model.pt", epoch))
-                logger.info('Dividing learning rate by 10')
-                optimizer.param_groups[0]['lr'] /= 10.
-
-            if tot_steps in args.when_steps:
-                logger.info(
-                    '(when steps) Saving model before learning rate decreased')
                 model_save('{}.e{}'.format("model.pt", epoch))
                 logger.info('Dividing learning rate by 10')
                 optimizer.param_groups[0]['lr'] /= 10.
