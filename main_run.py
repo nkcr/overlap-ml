@@ -65,6 +65,12 @@ def add_common_args(parser, model_name):
                         help='weight decay applied to all weights')
     parser.add_argument('--lr', type=float, default=30,
                         help='initial learning rate')
+    parser.add_argument('--when', nargs="+", type=int, default=[-1],
+                        help='When(which epochs) to divide the learning '
+                        'rate by 10 - accepts multiple')
+    parser.add_argument('--when-steps', nargs="+", type=int, default=[-1],
+                        help='When(which total step) to divide the learning '
+                        'rate by 10 - accepts multiple')
 
     # Data selection
     parser.add_argument('--init-seq', type=str, default="original",
@@ -184,9 +190,6 @@ class Simple:
                             default=0.87, help="Decay of learning rate")
         parser.add_argument('--lr-decay-start', type=int,
                             default=0, help="Epochs when lr decay starts")
-        parser.add_argument('--when', nargs="+", type=int, default=[-1],
-                            help='When(which epochs) to divide the learning '
-                            'rate by 10 - accepts multiple')
 
         args = parser.parse_args()
         return args
@@ -229,8 +232,6 @@ class AWD:
                             help='path of model to resume')
         parser.add_argument('--optimizer', type=str,  default='sgd',
                             help='optimizer to use (sgd, adam)')
-        parser.add_argument('--when', nargs="+", type=int, default=[-1],
-                            help='When (which epochs) to divide the learning rate by 10 - accepts multiple')
 
         # Our custum parameters
         parser.add_argument('--batch-max', type=int, default=128,
