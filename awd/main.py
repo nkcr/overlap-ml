@@ -283,8 +283,9 @@ def train(epoch):
             optimizer.param_groups[0]['lr'] /= 10.
 
         if tot_steps >= args.max_steps:
-            logger.info("Reached max-steps, triggering KeyboadInterrup")
-            raise KeyboardInterrupt
+            logger.info(f"Reached max-steps at tot step {tot_steps}, breaking "
+                        "the train function")
+            break
 
 
 # Loop over epochs.
@@ -385,6 +386,9 @@ try:
                 optimizer.param_groups[0]['lr'] /= 10.
 
             best_val_loss.append(val_loss)
+        if tot_steps >= args.max_steps:
+            logger.info("Reached max-steps, breaking the epoch loop")
+            break
     sk.end()
 
 except KeyboardInterrupt:
