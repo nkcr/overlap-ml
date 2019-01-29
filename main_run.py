@@ -71,7 +71,7 @@ def add_common_args(parser, model_name):
     parser.add_argument('--when-steps', nargs="+", type=int, default=[-1],
                         help='When(which total step) to divide the learning '
                         'rate by 10 - accepts multiple')
-    parser.add_argument('--max-steps', type=int, default=np.inf,
+    parser.add_argument('--max-steps', type=int, default=float("inf"),
                         help='Maximum number of total steps.')
 
     # Data selection
