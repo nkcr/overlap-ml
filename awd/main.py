@@ -283,6 +283,7 @@ def train(epoch):
             optimizer.param_groups[0]['lr'] /= 10.
 
         if tot_steps >= args.max_steps:
+            logger.info("Reached max-steps, triggering KeyboadInterrup")
             raise KeyboardInterrupt
 
 
