@@ -71,7 +71,7 @@ def add_common_args(parser, model_name):
     parser.add_argument('--when-steps', nargs="+", type=int, default=[-1],
                         help='When(which total step) to divide the learning '
                         'rate by 10 - accepts multiple')
-    parser.add_argument('--max-steps', type=int, default=-1,
+    parser.add_argument('--max-steps', type=int, default=np.inf,
                         help='Maximum number of total steps.')
 
     # Data selection
@@ -170,10 +170,6 @@ def common_init(that):
         that.ds.shuffle_each_row_train_seq()
     if that.args.shuffle_full_seq:
         that.ds.shuffle_full_train_seq()
-
-    # Initialize the max-step
-    if that.args.max_steps == -1:
-        that.args.max_steps = np.inf
 
 
 class Simple:
