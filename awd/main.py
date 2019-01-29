@@ -282,6 +282,9 @@ def train(epoch):
             logger.info('Dividing learning rate by 10')
             optimizer.param_groups[0]['lr'] /= 10.
 
+        if tot_steps >= args.max_steps:
+            raise KeyboardInterrupt
+
 
 # Loop over epochs.
 lr = args.lr
