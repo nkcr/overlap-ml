@@ -10,7 +10,8 @@ import random
 
 def add_common_args(parser, model_name):
     parser.add_argument("--main-model", type=str, required=True,
-                        choices=["simple-lstm", "awd-lstm", "mos-lstm"],
+                        choices=["simple-lstm", "awd-lstm",
+                                 "mos-lstm", "emotions-simple-lstm"],
                         help="The main model to use.")
 
     # Data, seed
@@ -197,6 +198,69 @@ class Simple:
         return args
 
 
+class Emotions:
+    """This class handles the arguments"""
+
+    def __init__(self):
+        # Don't use the common init for the moment
+        # common_init(self)
+        self.args = self.init_args()
+
+        if self.args.continue_train and self.args.model_dir is None:
+            raise Exception("'--model-dir' must be specified when using "
+                            "'--continue-train'")
+
+        prepare_dir(self.args)
+        self.logger = get_logger(self.args)
+        set_utils_logger(self.logger)
+        np.random.seed(self.args.seed)
+        random.seed(self.args.seed)
+        torch.manual_seed(self.args.seed)
+        init_device(self.args)
+        save_args(self.args)
+        save_commit_id(self.args)
+        self.tb = TensorBoard(self.args.model_dir)
+
+    def init_args(self):
+        # batch_size: 8
+        # lr: 1e-6
+        # optimizer: adam
+        parser = argparse.ArgumentParser(
+            description='PyTorch IEMOCAP RNN/LSTM Emotion detection',
+            conflict_handler='resolve', allow_abbrev=False)
+        add_common_args(parser, "simple")
+
+        parser.add_argument('--dropout', type=float,
+                            default=0.35, help="Probability to keep")
+        parser.add_argument('--momentum', type=float,
+                            default=0.0, help="Momentum of the optimizer")
+        parser.add_argument('--lr-decay', type=float,
+                            default=0.87, help="Decay of learning rate")
+        parser.add_argument('--lr-decay-start', type=int,
+                            default=0, help="Epochs when lr decay starts")
+        parser.add_argument('--cv', type=int,
+                            default=5, help="Cross-validation split")
+        parser.add_argument('--weighted', type=bool,
+                            default=True, help="Weighed loos in cas of "
+                            "unbalanced dataset")
+        parser.add_argument('--window-size', type=int,
+                            default=500, help="Number of frames")
+        parser.add_argument('--step-size', type=float,
+                            default=0.1, help="Percentage of the window")
+        parser.add_argument("--order", type=str, required=True,
+                            choices=['complete_random', 'local_order',
+                                     'standard_order', 'total_order'],
+                            help="The order to use as data-selection")
+        parser.add_argument('--data', type=str,
+                            default='data/IEMOCAP/all_features_cv/',
+                            help='location of the data corpus')
+        parser.add_argument('--optimizer', type=str,  default='adam',
+                            help='optimizer to use (sgd, adam)')
+
+        args = parser.parse_args()
+        return args
+
+
 class AWD:
     """This class handles the arguments"""
 
@@ -345,7 +409,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Parse only the main model argument")
     parser.add_argument("--main-model", type=str, required=True,
-                        choices=["simple-lstm", "awd-lstm", "mos-lstm"],
+                        choices=["simple-lstm", "awd-lstm",
+                                 "mos-lstm", "emotions-simple-lstm"],
                         help="The main model to use.")
     args, remaining = parser.parse_known_args()
 
@@ -355,3 +420,5 @@ if __name__ == "__main__":
         from mos import main
     elif args.main_model == "awd-lstm":
         from awd import main
+    elif args.main_model == "emotions-simple-lstm":
+        from emotions import main
