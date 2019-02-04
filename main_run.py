@@ -228,7 +228,7 @@ class Emotions:
         parser = argparse.ArgumentParser(
             description='PyTorch IEMOCAP RNN/LSTM Emotion detection',
             conflict_handler='resolve', allow_abbrev=False)
-        add_common_args(parser, "simple")
+        add_common_args(parser, "emotions_simple")
 
         parser.add_argument('--dropout', type=float,
                             default=0.35, help="Probability to keep")
