@@ -78,7 +78,7 @@ def add_common_args(parser, model_name):
     # Data selection
     parser.add_argument('--init-seq', type=str, default="original",
                         help='Initialization of the ds.current_seq '
-                        '(original, overlapC_N (contiguous), '
+                        '(original, overlap_N, overlapC_N (contiguous), '
                         'overlapCN_N (contiguous normalized')
     parser.add_argument('--train-seq', type=str, default="original",
                         help='Which ds.train_seq method to use '
@@ -137,6 +137,12 @@ def common_init(that):
     if that.args.init_seq == "original":
         # Done by default in DataSelector initialization
         pass
+    elif that.args.init_seq.startswith("overlap_"):
+        overlap = int(that.args.init_seq.split("_")[1])
+        if that.args.bptt % overlap != 0:
+            raise Exception(f"overlap must divide '--bptt' (found {overlap})")
+        that.ds.current_seq = that.ds.overlap_seq(
+            that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapC_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:

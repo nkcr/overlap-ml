@@ -148,6 +148,57 @@ class DataSelector:
         item_idx = item_idx.reshape(bsize, nbatch).T
         return item_idx
 
+    def overlap_seq(self, bsize, overlap):
+        """Makes overlapping batches.
+
+        To understand how the overlapping works, lets suppose our dataset
+        contains 18 tokens and `bptt` is set to 6.
+
+        - With no overlapping, we would build 3 datapoints:
+
+        |-----0-----|-----1-----|-----2-----|
+         a b c d e f g h i j k l m n o p q r
+
+        - With an overlapping of 2, we end up with 5 datapoints:
+
+            |-----1-----|-----3-----|
+        |-----0-----|-----2-----|-----4-----|
+         a b c d e f g h i j k l m n o p q r
+
+
+        - With an overlapping of 3, we end up with 7 datapoints:
+
+                |-----2-----|-----5-----|
+            |-----1-----|-----4-----|
+        |-----0-----|-----3-----|-----6-----|
+         a b c d e f g h i j k l m n o p q r
+
+        With the overlapping of 3, the sub-sequences are gradually shifted by
+        two, because 6 / 3 = 2. With the overlapping of 2, sub-sequences are
+        shifted by 3, because 6 / 2 = 3. Hence, the number of tokens per
+        datapoints must be divisible by the overlapping.
+
+        With the overlapping of 3 and a batch size of 2, here is the
+        corresponding current_seq:
+
+        0  3
+        1  4
+        2  5
+
+        """
+        dsize = self.train_data.size(0)
+        shift = self.args.bptt // overlap
+
+        ndatapoints = sum([(dsize-i*(self.args.bptt//overlap)) //
+                           self.args.bptt for i in range(overlap)])
+        item_idx = np.array(
+            [i for i in range(ndatapoints-ndatapoints % bsize)])
+        nbatch = ndatapoints // bsize
+        item_idx = item_idx.reshape(bsize, nbatch).T
+        self.nitems = ndatapoints
+        self.b2d = lambda i: i*shift
+        return item_idx.tolist()
+
     def overlap_c_seq(self, bsize, overlap):
         """Variant of the overlap sequence, with contiguous sequence.
 
