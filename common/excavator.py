@@ -144,9 +144,9 @@ class DataSelector:
         if nitems * self.args.bptt == self.train_data.size(0):
             nitems = nitems - 1
         nbatch = int(nitems // bsize)
-        item_idx = np.arange(0, nbatch*bsize)
-        item_idx = item_idx.reshape(bsize, nbatch).T
-        return item_idx
+        dp_seq = np.arange(0, nbatch*bsize)
+        dp_seq = dp_seq.reshape(bsize, nbatch).T
+        return dp_seq
 
     def overlap_seq(self, bsize, overlap):
         """Makes overlapping batches.
@@ -191,13 +191,13 @@ class DataSelector:
 
         ndatapoints = sum([(dsize-i*(self.args.bptt//overlap)) //
                            self.args.bptt for i in range(overlap)])
-        item_idx = np.array(
+        dp_seq = np.array(
             [i for i in range(ndatapoints-ndatapoints % bsize)])
         nbatch = ndatapoints // bsize
-        item_idx = item_idx.reshape(bsize, nbatch).T
+        dp_seq = dp_seq.reshape(bsize, nbatch).T
         self.nitems = ndatapoints
         self.b2d = lambda i: i*shift
-        return item_idx.tolist()
+        return dp_seq
 
     def overlap_c_seq(self, bsize, overlap):
         """Variant of the overlap sequence, with contiguous sequence.
