@@ -247,7 +247,7 @@ class Emotions:
         parser.add_argument('--cv', type=int,
                             default=5, help="Cross-validation split")
         parser.add_argument('--weighted', type=bool,
-                            default=True, help="Weighed loos in cas of "
+                            default=True, help="Weighed los in case of "
                             "unbalanced dataset")
         parser.add_argument('--window-size', type=int,
                             default=500, help="Number of frames")
