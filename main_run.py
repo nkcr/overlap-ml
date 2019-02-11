@@ -79,7 +79,8 @@ def add_common_args(parser, model_name):
     parser.add_argument('--init-seq', type=str, default="original",
                         help='Initialization of the ds.current_seq '
                         '(original, overlap_N, overlapC_N (contiguous), '
-                        'overlapCN_N (contiguous normalized')
+                        'overlapCN_N (contiguous normalized), '
+                        'overlapCNF_N (contiguous normalized flexible)')
     parser.add_argument('--train-seq', type=str, default="original",
                         help='Which ds.train_seq method to use '
                         '(original, repeat_N')
@@ -155,6 +156,13 @@ def common_init(that):
             raise Exception(
                 f"overlapCN must divide '--bptt' (found {overlap})")
         that.ds.current_seq = that.ds.overlap_cn_seq(
+            that.args.batch_size, overlap)
+    elif that.args.init_seq.startswith("overlapCNF_"):
+        overlap = int(that.args.init_seq.split("_")[1])
+        if overlap > that.args.bptt:
+            raise Exception(
+                f"overlapCNF must be lower than '--bptt' (found {overlap})")
+        that.ds.current_seq = that.ds.overlap_cnf_seq(
             that.args.batch_size, overlap)
     else:
         raise Exception(f"init-seq unkown: {that.args.init_seq}")

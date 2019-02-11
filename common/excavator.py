@@ -16,7 +16,7 @@ Unit test: excavator_test.py
 
 class DataSelector:
     """This class is responsible for all the transactions with the
-    datasets. It is espacially used as an attempt to perform better
+    datasets. It is especially used as an attempt to perform better
     data selection on the training set.
     """
 
@@ -200,7 +200,7 @@ class DataSelector:
         return dp_seq
 
     def overlap_c_seq(self, bsize, overlap):
-        """Variant of the overlap sequence, with contiguous sequence.
+        """Variant of the overlap sequence, with Contiguous sequence.
 
         To understand how the overlapping works, lets suppose our dataset
         contains 18 tokens and `bptt` is set to 6.
@@ -261,7 +261,7 @@ class DataSelector:
         return dp_seq
 
     def overlap_cn_seq(self, bsize, overlap):
-        """Variant of the overlap sequence, with contiguous normalized sequence.
+        """Variant of the overlap sequence, with Contiguous Normalized sequence.
 
         The normalized version uses the same lenght for every sub-sequences.
         Here is a version without normalization:
@@ -287,6 +287,42 @@ class DataSelector:
         """
         dsize = self.train_data.size(0)
         shift = self.args.bptt // overlap
+        ndatapoints = sum([(dsize-i*shift) // self.args.bptt
+                           for i in range(overlap)])
+        result = []
+        for i in range(overlap):
+            for j in range(ndatapoints//overlap):
+                result.append(i+j*overlap)
+        dp_seq = np.array(result[:len(result)-len(result) % bsize])
+        nbatch = dp_seq.size // bsize
+        dp_seq = dp_seq.reshape(bsize, nbatch).T
+        self.b2d = lambda i: i*shift
+        return dp_seq
+
+    def overlap_cnf_seq(self, bsize, overlap):
+        """Variant of the overlap sequence, with Contiguous Normalized Flexible
+        sequence.
+
+        The flexible version allows the overlapping number to be any number
+        between 1 and the number of tokens per data-point (args.bptt).
+
+        With args.bptt = 5 and an overlapping of 2, we have an offset of 2.5,
+        which is rounded to 2. Here is the result:
+
+                |----2----|----5----|
+            |----1----|----4----|
+        |----0----|----3----|
+         a b c d e f g h i j k l m n o p q r
+
+        Which yields the following train_seq for a batch size of 2:
+
+        contiguous normalized flexible
+           0  4
+           3  2
+           1  5
+        """
+        dsize = self.train_data.size(0)
+        shift = int(round(self.args.bptt / overlap))
         ndatapoints = sum([(dsize-i*shift) // self.args.bptt
                            for i in range(overlap)])
         result = []

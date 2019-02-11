@@ -162,7 +162,7 @@ class DataSelectorTest(unittest.TestCase):
         self.that.train_data = train_data
         self.that.args.bptt = bptt
         result = DataSelector.overlap_seq(self.that, batch_size, overlap)
-        self.assertEqual(result, expected)
+        self.assertEqual(result.tolist(), expected)
         self.assertEqual(self.that.nitems, 10)
 
         batch_size = 4
@@ -176,7 +176,7 @@ class DataSelectorTest(unittest.TestCase):
         ]
         self.that.args.bptt = bptt
         result = DataSelector.overlap_seq(self.that, batch_size, overlap)
-        self.assertEqual(result, expected)
+        self.assertEqual(result.tolist(), expected)
         self.assertEqual(self.that.nitems, 11)
 
         batch_size = 4
@@ -191,7 +191,7 @@ class DataSelectorTest(unittest.TestCase):
             [4, 9, 14, 19]
         ]
         result = DataSelector.overlap_seq(self.that, batch_size, overlap)
-        self.assertEqual(result, expected)
+        self.assertEqual(result.tolist(), expected)
         self.assertEqual(self.that.nitems, 22)
 
         batch_size = 4
@@ -204,7 +204,7 @@ class DataSelectorTest(unittest.TestCase):
         ]
         self.that.args.bptt = bptt
         result = DataSelector.overlap_seq(self.that, batch_size, overlap)
-        self.assertEqual(result, expected)
+        self.assertEqual(result.tolist(), expected)
         self.assertEqual(self.that.nitems, 6)
 
     def test_overlap_c_seq(self):
@@ -297,6 +297,91 @@ class DataSelectorTest(unittest.TestCase):
         ]
         self.that.args.bptt = bptt
         result = DataSelector.overlap_cn_seq(self.that, batch_size, overlap)
+        self.assertEqual(result.tolist(), expected)
+
+    def test_overlap_cnf_seq(self):
+        #
+        # Should give the same as the CN version in the case the number is
+        # dividable:
+        #
+
+        train_data = torch.tensor(np.arange(0, 25)).view(-1, 1)
+        batch_size = 6
+        bptt = 6
+        overlap = 3
+        # max_end should be 25
+        # data points are [0,1,2,...19]
+        # number of data points is 4+3+3 = 10
+        # number of batches is 10 // 6 = 1
+        expected = [
+            [0, 3, 6, 1, 4, 7]
+        ]
+        self.that.train_data = train_data
+        self.that.args.bptt = bptt
+        result = DataSelector.overlap_cnf_seq(self.that, batch_size, overlap)
+        self.assertEqual(result.tolist(), expected)
+
+        batch_size = 4
+        bptt = 4
+        overlap = 2
+        # number of data points is 6+5 = 11
+        # number of batches is 11 // 4 = 2
+        expected = [
+            [0, 4, 8, 3],
+            [2, 6, 1, 5]
+        ]
+        self.that.args.bptt = bptt
+        result = DataSelector.overlap_cnf_seq(self.that, batch_size, overlap)
+        self.assertEqual(result.tolist(), expected)
+
+        batch_size = 4
+        bptt = 4
+        overlap = 4
+        # number of data points is 6+5+5+6 = 22
+        # number of batches is 21 // 4 = 5
+        expected = [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+            [8, 9, 10, 11],
+            [12, 13, 14, 15],
+            [16, 17, 18, 19]
+        ]
+        self.that.args.bptt = bptt
+        result = DataSelector.overlap_cnf_seq(self.that, batch_size, overlap)
+        self.assertEqual(result.tolist(), expected)
+
+        #
+        # Using now a non-dividable value:
+        #
+
+        train_data = torch.tensor(np.arange(0, 25)).view(-1, 1)
+        batch_size = 6
+        bptt = 5
+        overlap = 3
+        # max_end should be 25
+        # data points are [0,1,2,...19]
+        # number of data points is 4+3+3 = 10
+        # number of batches is 10 // 6 = 1
+        expected = [
+            [0, 6, 1, 7, 2, 8],
+            [3, 9, 4, 10, 5, 11]
+        ]
+        self.that.train_data = train_data
+        self.that.args.bptt = bptt
+        result = DataSelector.overlap_cnf_seq(self.that, batch_size, overlap)
+        self.assertEqual(result.tolist(), expected)
+
+        batch_size = 4
+        bptt = 5
+        overlap = 2
+        # number of data points is 6+5 = 11
+        # number of batches is 11 // 4 = 2
+        expected = [
+            [0, 4, 1, 5],
+            [2, 6, 3, 7]
+        ]
+        self.that.args.bptt = bptt
+        result = DataSelector.overlap_cnf_seq(self.that, batch_size, overlap)
         self.assertEqual(result.tolist(), expected)
 
     def test_shuffle(self):
