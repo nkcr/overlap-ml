@@ -316,13 +316,13 @@ class DataSelector:
 
         Which yields the following train_seq for a batch size of 2:
 
-        contiguous normalized flexible
            0  4
            3  2
            1  5
         """
         dsize = self.train_data.size(0)
         shift = int(round(self.args.bptt / overlap))
+        real_shift = self.args.bptt / overlap
         ndatapoints = sum([(dsize-i*shift) // self.args.bptt
                            for i in range(overlap)])
         result = []
@@ -332,7 +332,7 @@ class DataSelector:
         dp_seq = np.array(result[:len(result)-len(result) % bsize])
         nbatch = dp_seq.size // bsize
         dp_seq = dp_seq.reshape(bsize, nbatch).T
-        self.b2d = lambda i: i*shift
+        self.b2d = lambda i: int(round(i*real_shift))
         return dp_seq
 
     # ________________________________________________________________________
