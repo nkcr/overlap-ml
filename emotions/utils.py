@@ -127,7 +127,7 @@ def load(data_path, cv):
     test_ids = np.arange(len(train_features), len(
         test_features) + len(train_features))
 
-    return train_features, train_labels, train_ids, test_features, test_labels, test_ids
+    return train_features, train_labels, train_ids, test_features, test_labels, test_ids, num_class
 
 
 def to_categorical(label_list):
@@ -136,6 +136,7 @@ def to_categorical(label_list):
 
     :param label_list: list of lists of categorical (strings) labels
     :return: list of lists of categorical (int to Tensor) labels
+    :return: number of different labels
     """
 
     labels_set = sorted(
@@ -151,7 +152,7 @@ def to_categorical(label_list):
             categorical[i] = labels_dict[list_[i]]
 
         return_list.append(torch.FloatTensor(categorical))
-    return return_list
+    return return_list[0], return_list[1], len(labels_dict)
 
 
 class SimpleLossCompute:

@@ -19,19 +19,20 @@ dh = DataHandler(args)
 
 
 class SimpleLSTM(nn.Module):
-    def __init__(self, args, ntokens):
+    def __init__(self, args, num_class, num_features):
         super(SimpleLSTM, self).__init__()
         self.args = args
-        self.ntokens = ntokens
+        self.num_class = num_class
+        self.num_features = num_features
 
-        self.embedding = nn.Embedding(ntokens, args.nhid)
+        self.embedding = nn.Embedding(num_features, args.nhid)
 
         self.dropout = nn.Dropout(1 - self.args.dropout)
 
         self.lstm = nn.LSTM(input_size=args.nhid,
                             hidden_size=args.nhid, num_layers=args.nlayers)
 
-        self.decoder = nn.Linear(args.nhid, ntokens)
+        self.decoder = nn.Linear(args.nhid, num_class)
 
         self.init_weights()
 
@@ -48,7 +49,7 @@ class SimpleLSTM(nn.Module):
         output, hidden = self.lstm(data, hidden)
         output = self.dropout(output)
         output = self.decoder(output.view(-1, self.args.nhid))
-        output = output.view(-1, batch_size, self.ntokens)
+        output = output.view(-1, batch_size, self.num_class)
         return output, hidden
 
     def init_hidden(self, batch_size):
@@ -68,7 +69,7 @@ if args.continue_train:
     ), lr=args.lr, weight_decay=args.wdecay, momentum=args.momentum)
     optimizer.load_state_dict(optimizer_state)
 else:
-    model = SimpleLSTM(args, ds.ntokens)
+    model = SimpleLSTM(args, dh.num_class, dh.num_features)
     optimizer = torch.optim.SGD(model.parameters(
     ), lr=args.lr, weight_decay=args.wdecay, momentum=args.momentum)
 

@@ -20,6 +20,7 @@ class DataHandler:
         self.step_size = args.step_size
         self.batch_size = args.batch_size
         self.lr = args.lr
+        self.num_features = 384  # to be refactored..
 
         if args.optimizer == 'sgd':
             self.opt = torch.optim.SGD
@@ -44,7 +45,8 @@ class DataHandler:
 
     def load_data(self):
         train_features, train_labels, train_ids, test_features,\
-            test_labels, test_ids = load(self.data_path, self.cv)
+            test_labels, test_ids, self.num_class = load(
+                self.data_path, self.cv)
 
         # Creating dataset and dataloader
         train = AudioWindowDataset(train_features, train_labels, train_ids,
