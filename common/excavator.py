@@ -321,8 +321,8 @@ class DataSelector:
            1  5
         """
         dsize = self.train_data.size(0)
-        shift = int(round(self.args.bptt / overlap))
         real_shift = self.args.bptt / overlap
+        shift = int(round(real_shift))
         ndatapoints = sum([(dsize-i*shift) // self.args.bptt
                            for i in range(overlap)])
         result = []
