@@ -32,7 +32,7 @@ def add_common_args(parser, model_name):
     # log directory, log interval
     parser.add_argument('--log-interval', type=int, default=200, metavar='N',
                         help='report interval')
-    parser.add_argument('--log-dir', type=str, default=f'logs/{model_name}',
+    parser.add_argument('--log-dir', type=str, default='logs/{}'.format(model_name),
                         help="Directory containing the runs")
     parser.add_argument('--model-dir', type=str, help='Directory of the run. '
                         'If not specified, one is created based on the time.')
@@ -141,31 +141,31 @@ def common_init(that):
     elif that.args.init_seq.startswith("overlap_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
-            raise Exception(f"overlap must divide '--bptt' (found {overlap})")
+            raise Exception("overlap must divide '--bptt' (found {})".format(overlap))
         that.ds.current_seq = that.ds.overlap_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapC_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
-            raise Exception(f"overlapC must divide '--bptt' (found {overlap})")
+            raise Exception("overlapC must divide '--bptt' (found {})".format(overlap))
         that.ds.current_seq = that.ds.overlap_c_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapCN_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
             raise Exception(
-                f"overlapCN must divide '--bptt' (found {overlap})")
+                "overlapCN must divide '--bptt' (found {})".format(overlap))
         that.ds.current_seq = that.ds.overlap_cn_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapCNF_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if overlap > that.args.bptt:
             raise Exception(
-                f"overlapCNF must be lower than '--bptt' (found {overlap})")
+                "overlapCNF must be lower than '--bptt' (found {})".format(overlap))
         that.ds.current_seq = that.ds.overlap_cnf_seq(
             that.args.batch_size, overlap)
     else:
-        raise Exception(f"init-seq unkown: {that.args.init_seq}")
+        raise Exception("init-seq unkown: {}".format(that.args.init_seq))
 
     # Type of train_seq
     if that.args.train_seq == "original":
@@ -174,7 +174,7 @@ def common_init(that):
         n = int(that.args.train_seq.split("_")[1])
         that.train_seq = lambda: that.ds.repeated_train_seq(n)
     else:
-        raise Exception(f"train-seq unkown: {that.args.train_seq}")
+        raise Exception("train-seq unkown: {}".format(that.args.train_seq))
 
     # Shuffling of the train_seq
     if that.args.shuffle_row_seq:

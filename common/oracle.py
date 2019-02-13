@@ -56,13 +56,13 @@ class StatsKeeper():
         self.current_data.append(value)
 
     def _save_epoch(self):
-        data_path = os.path.join(self.path, f"epoch_{self.epoch}.json")
+        data_path = os.path.join(self.path, "epoch_{}.json".format(self.epoch))
         # np.save(data_path, np.array(self.current_data))
         with open(data_path, 'w') as outfile:
             json.dump(self.current_data, outfile)
 
     def _init_new_epoch(self, epoch):
-        self.logger.info(f"(oracle) Init new epoch: {epoch}")
+        self.logger.info("(oracle) Init new epoch: {}".format(epoch))
         self.epoch = epoch
         self.past_data = self.current_data
         self.current_data = []
@@ -77,26 +77,26 @@ class StatsKeeper():
 
     def save_prior_epoch(self):
         data_path = os.path.join(
-            self.path, f"epoch_{self.prior_epoch}_prior.json")
+            self.path, "epoch_{}_prior.json".format(self.prior_epoch))
         # np.save(data_path, np.array(self.current_data))
         with open(data_path, 'w') as outfile:
             json.dump(self.prior_scores, outfile)
 
     def _init_new_prior_epoch(self, epoch):
-        self.logger.info(f"(oracle) Init new prior epoch: {epoch}")
+        self.logger.info("(oracle) Init new prior epoch: {}".format(epoch))
         self.prior_epoch = epoch
         self.prior_scores = []
 
     def _init_folder(self, path):
         if not os.path.exists(path):
-            self.logger.info(f"(oracle) Creates {path}")
+            self.logger.info("(oracle) Creates {}".format(path))
             os.makedirs(path)
 
     def save_seq(self, seq):
         """Saves the sequence as JSON, referenced by the epoch"""
         if type(seq) is np.ndarray:
             seq = seq.tolist()
-        data_path = os.path.join(self.path, f"epoch_{self.epoch}_seq.json")
+        data_path = os.path.join(self.path, "epoch_{}_seq.json".format(self.epoch))
         # np.save(data_path, np.array(seq))
         with open(data_path, 'w') as outfile:
             json.dump(seq, outfile)
@@ -114,12 +114,12 @@ class StatsKeeper():
 
     def _save_data_epoch(self, name):
         data_path = os.path.join(
-            self.path, f"epoch_{self.data_epoch[name]}_{name}")
+            self.path, "epoch_{}_{}".format(self.data_epoch[name], name))
         np.save(data_path, np.array(self.data[name]))
         # with open(data_path, 'w') as outfile:
         #     json.dump(self.data[name], outfile)
 
     def _init_new_data_epoch(self, name, epoch):
-        self.logger.info(f"(oracle) Init new epoch: {epoch} (for '{name}')")
+        self.logger.info("(oracle) Init new epoch: {} (for '{}')".format(epoch, name))
         self.data_epoch[name] = epoch
         self.data[name] = []
