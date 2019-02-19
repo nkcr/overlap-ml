@@ -71,8 +71,8 @@ class DataSelector:
         # Value should be a 2D numpy array
         self._current_seq = value
         self.nbatch = self.current_seq.shape[0]
-        self.logger.info(f"(excavator) New current_seq. "
-                         f"Shape: {self.current_seq.shape}")
+        self.logger.info("(excavator) New current_seq. "
+                         "Shape: {}".format(self.current_seq.shape))
 
     # ________________________________________________________________________
     # Utility / Initializations
@@ -84,7 +84,7 @@ class DataSelector:
         data = data.narrow(0, 0, nbatch * bsz)
         # Evenly divide the data across the bsz batches.
         data = data.view(bsz, -1).t().contiguous().to(self.args.device)
-        self.logger.info(f"(utils) Data size: {data.size()}.")
+        self.logger.info("(utils) Data size: {}.".format(data.size()))
         return data
 
     def get_batch(self, source, i, seq_len=None):

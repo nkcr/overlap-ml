@@ -120,7 +120,7 @@ def load(data_path, cv):
 
     # String to category labels
     print('[INFO] Labels to categorical...')
-    train_labels, test_labels = to_categorical([train_labels, test_labels])
+    train_labels, test_labels, num_class = to_categorical([train_labels, test_labels])
 
     # Ids: you probably won't need them
     train_ids = np.arange(len(train_features))

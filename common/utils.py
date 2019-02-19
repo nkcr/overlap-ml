@@ -31,7 +31,7 @@ def batchify(data, bsz, args):
     data = data.narrow(0, 0, nbatch * bsz)
     # Evenly divide the data across the bsz batches.
     data = data.view(bsz, -1).t().contiguous().to(args.device)
-    logger.info(f"(utils) Data size: {data.size()}.")
+    logger.info("(utils) Data size: {}.".format(data.size()))
     return data
 
 
@@ -68,7 +68,7 @@ def init_device(args):
             logger.info('WARNING: No CUDA device found, using CPU. '
                         'It would be best to explicitly run with --no-cuda')
         setattr(args, 'device', 'cpu')
-    logger.info(f"Using device: {args.device}")
+    logger.info("Using device: {}".format(args.device))
 
 
 def prepare_dir(args):
@@ -76,11 +76,11 @@ def prepare_dir(args):
     if args.model_dir is None:
         model_dir = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         if args.model_dir_prefix is not None:
-            model_dir = f"{args.model_dir_prefix}-{model_dir}"
+            model_dir = "{}-{}".format(args.model_dir_prefix, model_dir)
         model_dir = os.path.join(args.log_dir, model_dir)
         setattr(args, "model_dir", model_dir)
     if not os.path.exists(args.model_dir):
-        print(f"Creating {args.model_dir}")
+        print("Creating {}".format(args.model_dir))
         os.makedirs(args.model_dir)
 
 

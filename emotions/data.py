@@ -19,6 +19,7 @@ class DataHandler:
         self.window_size = args.window_size
         self.step_size = args.step_size
         self.batch_size = args.batch_size
+        self.test_batch_size = args.test_batch_size
         self.lr = args.lr
         self.num_features = 384  # to be refactored..
 
@@ -37,11 +38,15 @@ class DataHandler:
         for i, batch in enumerate(self.train_data):
             batch_x = Variable(batch.src, requires_grad=False)
             batch_y = Variable(batch.trg, requires_grad=False)
-            yield batch_x, batch_y
-            # print(batch_x.shape)
-            # print(batch_y.shape)
-            # print(batch.ids)
-            # break
+            id_ = batch.ids
+            yield batch_x, batch_y, id_
+    
+    def test_seq(self):
+        for i, batch in enumerate(self.test_data):
+            batch_x = Variable(batch.src, requires_grad=False)
+            batch_y = Variable(batch.trg, requires_grad=False)
+            id_ = batch.ids
+            yield batch_x, batch_y, id_
 
     def load_data(self):
         train_features, train_labels, train_ids, test_features,\
@@ -60,9 +65,9 @@ class DataHandler:
         test = AudioWindowDataset(test_features, test_labels, test_ids,
                                   window_size=self.window_size,
                                   step_size=self.step_size,
-                                  how=self.order, batch_size=self.batch_size)
+                                  how=self.order, batch_size=self.test_batch_size)
         self.test_data = DataLoader(test, collate_fn=collate_fn,
-                                    batch_size=self.batch_size,
+                                    batch_size=self.test_batch_size,
                                     num_workers=0)
 
         self.weights = None
