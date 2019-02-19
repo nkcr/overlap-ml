@@ -138,6 +138,11 @@ def train():
         batch += 1
         tot_steps += 1
 
+        if tot_steps >= args.max_steps:
+            logger.info(f"Reached max-steps at tot step {tot_steps}, breaking "
+                        "the train function")
+            break
+
 
 best_val_loss = []
 stored_loss = np.inf
@@ -171,6 +176,10 @@ try:
             logger.info('Saving Normal!')
             stored_loss = val_loss
         best_val_loss.append(val_loss)
+
+        if tot_steps >= args.max_steps:
+            logger.info("Reached max-steps, breaking the epoch loop")
+            break
 
 except KeyboardInterrupt:
     logger.info('-' * 89)
