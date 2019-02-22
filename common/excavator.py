@@ -342,10 +342,6 @@ class DataSelector:
         The fake version actually does not perform any overlapping but
         simulates it.
 
-        With args.bptt = 5 and an overlapping of 2, we have an offset of 2.5,
-        which is rounded to 2. Here is the result:
-
-
         Here is a version without fake:
 
                 |-----2-----|-----5-----|
@@ -353,7 +349,7 @@ class DataSelector:
         |-----0-----|-----3-----|
          a b c d e f g h i j k l m n o p q r
 
-        And here is the fake version:
+        And here is the corresponding fake version:
 
         |-----0-----|-----3-----|
         |-----0-----|-----3-----|
