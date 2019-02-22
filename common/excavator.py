@@ -260,6 +260,53 @@ class DataSelector:
         self.b2d = lambda i: i*shift
         return dp_seq
 
+    def overlap_cx_seq(self, bsize, overlap):
+        """Variant of the overlap sequence, with Contiguous FAKE sequence.
+
+        The fake version simulates an overlapping, but only duplicates the
+        first overlapping sequence.
+
+        Here is a version without fake:
+
+                |-----2-----|-----5-----|
+            |-----1-----|-----4-----|
+        |-----0-----|-----3-----|-----6-----|
+         a b c d e f g h i j k l m n o p q r
+
+        And here is the fake version:
+
+        |-----0-----|-----3-----|-----6-----|
+        |-----0-----|-----3-----|-----6-----|
+        |-----0-----|-----3-----|-----6-----|
+         a b c d e f g h i j k l m n o p q r
+
+        Which yields the following train_seq for a batch size of 2:
+
+        non-fake      cfake
+           0  1          0  3
+           3  4          3  6
+           6  2          6  0
+                         0  3
+        """
+        dsize = self.train_data.size(0)
+        shift = self.args.bptt // overlap
+
+        len_sub_seq = dsize // self.args.bptt
+        dp_seq = np.array(range(overlap*len_sub_seq)
+                          ).reshape(len_sub_seq, overlap)
+        dp_seq = dp_seq.T[0]
+        dp_seq = np.array(dp_seq.tolist()*overlap)
+        # We ensure that each datapoint has actual corrsponding tokens and
+        # can reach its +1 token for the target.
+        dp_seq = dp_seq[(dp_seq*shift+self.args.bptt) < dsize]
+
+        dp_seq = dp_seq[:len(dp_seq)-len(dp_seq) % bsize]
+        ndatapoints = dp_seq.size
+        nbatch = ndatapoints // bsize
+        dp_seq = dp_seq.reshape(bsize, nbatch).T
+        self.b2d = lambda i: i*shift
+        return dp_seq
+
     def overlap_cn_seq(self, bsize, overlap):
         """Variant of the overlap sequence, with Contiguous Normalized sequence.
 
