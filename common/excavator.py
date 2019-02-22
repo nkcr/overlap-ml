@@ -374,7 +374,7 @@ class DataSelector:
         dp_seq = np.array(result[:len(result)-len(result) % bsize])
         nbatch = dp_seq.size // bsize
         dp_seq = dp_seq.reshape(bsize, nbatch).T
-        self.b2d = lambda i: shift
+        self.b2d = lambda i: i*shift
         return dp_seq
 
     # ________________________________________________________________________
