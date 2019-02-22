@@ -80,7 +80,8 @@ def add_common_args(parser, model_name):
                         help='Initialization of the ds.current_seq '
                         '(original, overlap_N, overlapC_N (contiguous), '
                         'overlapCN_N (contiguous normalized), '
-                        'overlapCNF_N (contiguous normalized flexible)')
+                        'overlapCNF_N (contiguous normalized flexible), '
+                        'overlapCNX_N (contiguous normalized fake')
     parser.add_argument('--train-seq', type=str, default="original",
                         help='Which ds.train_seq method to use '
                         '(original, repeat_N')
@@ -141,13 +142,15 @@ def common_init(that):
     elif that.args.init_seq.startswith("overlap_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
-            raise Exception("overlap must divide '--bptt' (found {})".format(overlap))
+            raise Exception(
+                "overlap must divide '--bptt' (found {})".format(overlap))
         that.ds.current_seq = that.ds.overlap_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapC_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
-            raise Exception("overlapC must divide '--bptt' (found {})".format(overlap))
+            raise Exception(
+                "overlapC must divide '--bptt' (found {})".format(overlap))
         that.ds.current_seq = that.ds.overlap_c_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapCN_"):
@@ -156,6 +159,13 @@ def common_init(that):
             raise Exception(
                 "overlapCN must divide '--bptt' (found {})".format(overlap))
         that.ds.current_seq = that.ds.overlap_cn_seq(
+            that.args.batch_size, overlap)
+    elif that.args.init_seq.startswith("overlapCNX_"):
+        overlap = int(that.args.init_seq.split("_")[1])
+        if that.args.bptt % overlap != 0:
+            raise Exception(
+                "overlapCN must divide '--bptt' (found {})".format(overlap))
+        that.ds.current_seq = that.ds.overlap_cnx_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapCNF_"):
         overlap = int(that.args.init_seq.split("_")[1])

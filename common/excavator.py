@@ -335,6 +335,52 @@ class DataSelector:
         self.b2d = lambda i: int(round(i*real_shift))
         return dp_seq
 
+    def overlap_cnx_seq(self, bsize, overlap):
+        """Variant of the overlap sequence, with Contiguous Normalized FAKE
+        sequence.
+
+        The fake version actually does not perform any overlapping but
+        simulates it.
+
+        With args.bptt = 5 and an overlapping of 2, we have an offset of 2.5,
+        which is rounded to 2. Here is the result:
+
+
+        Here is a version without fake:
+
+                |-----2-----|-----5-----|
+            |-----1-----|-----4-----|
+        |-----0-----|-----3-----|
+         a b c d e f g h i j k l m n o p q r
+
+        And here is the fake version:
+
+        |-----0-----|-----3-----|
+        |-----0-----|-----3-----|
+        |-----0-----|-----3-----|
+         a b c d e f g h i j k l m n o p q r
+
+        Which yields the following train_seq for a batch size of 2:
+
+        Witout fake     Fake
+         0  4           0  3
+         3  2           3  0
+         1  5           0  3
+        """
+        dsize = self.train_data.size(0)
+        shift = self.args.bptt // overlap
+        ndatapoints = sum([(dsize-i*shift) // self.args.bptt
+                           for i in range(overlap)])
+        result = []
+        for _ in range(overlap):
+            for j in range(ndatapoints//overlap):
+                result.append(j*overlap)
+        dp_seq = np.array(result[:len(result)-len(result) % bsize])
+        nbatch = dp_seq.size // bsize
+        dp_seq = dp_seq.reshape(bsize, nbatch).T
+        self.b2d = lambda i: shift
+        return dp_seq
+
     # ________________________________________________________________________
     # Train seq update
 

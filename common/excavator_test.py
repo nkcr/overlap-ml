@@ -384,6 +384,59 @@ class DataSelectorTest(unittest.TestCase):
         result = DataSelector.overlap_cnf_seq(self.that, batch_size, overlap)
         self.assertEqual(result.tolist(), expected)
 
+    def test_overlap_cnx_seq(self):
+        #
+        # Contiguous Normalized Fake
+        #
+
+        train_data = torch.tensor(np.arange(0, 25)).view(-1, 1)
+        batch_size = 6
+        bptt = 6
+        overlap = 3
+        # max_end should be 25
+        # data points are [0,1,2,...19]
+        # number of data points is 4+3+3 = 10
+        # number of batches is 10 // 6 = 1
+        expected = [
+            [0, 3, 6, 0, 3, 6]
+        ]
+        self.that.train_data = train_data
+        self.that.args.bptt = bptt
+        result = DataSelector.overlap_cnx_seq(
+            self.that, batch_size, overlap).tolist()
+        self.assertEqual(result, expected)
+
+        batch_size = 4
+        bptt = 4
+        overlap = 2
+        # number of data points is 6+5 = 11
+        # number of batches is 11 // 4 = 2
+        expected = [
+            [0, 4, 8, 2],
+            [2, 6, 0, 4]
+        ]
+        self.that.args.bptt = bptt
+        result = DataSelector.overlap_cnx_seq(
+            self.that, batch_size, overlap).tolist()
+        self.assertEqual(result, expected)
+
+        batch_size = 4
+        bptt = 4
+        overlap = 4
+        # number of data points is 6+5+5+6 = 22
+        # number of batches is 21 // 4 = 5
+        expected = [
+            [0, 0, 0, 0],
+            [4, 4, 4, 4],
+            [8, 8, 8, 8],
+            [12, 12, 12, 12],
+            [16, 16, 16, 16]
+        ]
+        self.that.args.bptt = bptt
+        result = DataSelector.overlap_cnx_seq(
+            self.that, batch_size, overlap).tolist()
+        self.assertEqual(result, expected)
+
     def test_shuffle(self):
         self.that.rstate = np.random.RandomState(1)
         basic = np.array(range(24)).reshape(6, 4)
