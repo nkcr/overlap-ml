@@ -445,7 +445,7 @@ if __name__ == "__main__":
         description="Parse only the main model argument")
     parser.add_argument("--main-model", type=str, required=True,
                         choices=["simple-lstm", "awd-lstm",
-                                 "mos-lstm", "emotions-simple-lstm"],
+                                 "mos-lstm", "emotions-simple-lstm", "awd-lstm_repetitions"],
                         help="The main model to use.")
     args, remaining = parser.parse_known_args()
 
