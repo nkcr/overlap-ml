@@ -433,6 +433,9 @@ class MOS:
         parser.add_argument('--single-gpu', default=False, action='store_true',
                             help='use single GPU')
 
+        parser.add_argument('--use_repetitions', type=int, default=1)
+        
+
         args = parser.parse_args()
         return args
 
@@ -452,5 +455,7 @@ if __name__ == "__main__":
         from mos import main
     elif args.main_model == "awd-lstm":
         from awd import main
+    elif args.main_model == "awd-lstm_repetitions":
+        from awd import repetitions_main as main
     elif args.main_model == "emotions-simple-lstm":
         from emotions import main
