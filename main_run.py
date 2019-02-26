@@ -11,8 +11,11 @@ import random
 def add_common_args(parser, model_name):
     parser.add_argument("--main-model", type=str, required=True,
                         choices=["simple-lstm", "awd-lstm",
-                                 "mos-lstm", "emotions-simple-lstm"],
+                                 "mos-lstm", "emotions-simple-lstm", "awd-lstm_repetitions"],
                         help="The main model to use.")
+
+    parser.add_argument('--use_repetitions', type=int, default=7,
+                        help='number of repetitions')
 
     # Data, seed
     parser.add_argument('--seed', type=int, default=1111,

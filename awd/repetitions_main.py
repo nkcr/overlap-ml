@@ -104,7 +104,7 @@ if not criterion:
     elif ntokens > 75000:
         # WikiText-103
         splits = [2800, 20000, 76000]
-    logger.info(f'Using {str(splits)}')
+    logger.info('Using {}'.format(splits))
     criterion = SplitCrossEntropyLoss(
         args.emsize, splits=splits, verbose=False)
 ###
@@ -114,8 +114,8 @@ tot_steps = 0
 ###
 params = list(model.parameters()) + list(criterion.parameters())
 total_params = sum(x.numel() for x in params)
-logger.info(f'Args: {args}')
-logger.info(f'Model total parameters: {total_params}')
+logger.info('Args: {}'.format(args))
+logger.info('Model total parameters: {}'.format(total_params))
 
 ###############################################################################
 # Training code
@@ -278,14 +278,14 @@ def train(epoch, hidden_init):
         i += 1
 
         if tot_steps in args.when_steps:
-            logger.info(f'(Step {tot_steps}) Saving model before learning '
+            logger.info('(Step {}) Saving model before learning '.format(tot_steps),
                         'rate decreased')
             model_save('{}.e{}'.format("model.pt", epoch))
             logger.info('Dividing learning rate by 10')
             optimizer.param_groups[0]['lr'] /= 10.
 
         if tot_steps >= args.max_steps:
-            logger.info(f"Reached max-steps at tot step {tot_steps}, breaking "
+            logger.info("Reached max-steps at tot step {}, breaking ".format(tot_steps) +
                         "the train function")
             break
 
@@ -309,7 +309,7 @@ try:
     if args.get_priors:
         logger.info("Computing priors")
         loss = evaluate_scores(1, ds.batch_size)
-        logger.info(f"Evaluated scores ({loss})")
+        logger.info("Evaluated scores ({})".format(loss))
 
     hidden_glob = model.init_hidden(ds.batch_size)
     
@@ -320,7 +320,7 @@ try:
             ds.current_seq = ds.manual_seq(1)
             logger.info("Computing priors")
             loss = evaluate_scores(epoch, ds.batch_size)
-            logger.info(f"Evaluated scores ({loss})")
+            logger.info("Evaluated scores ({})".format(loss))
             ds.set_fixed_bsize_seq(sk.prior_scores, args.batch_size)
 
         if args.update_random_rotate:

@@ -58,29 +58,6 @@ class SimpleLSTM(nn.Module):
                 torch.tensor(weight.new(self.args.nlayers, batch_size,
                                         self.args.nhid).zero_()))
 
-
-if args.continue_train:
-    model = torch.load(os.path.join(args.model_dir, 'model.pt'))
-    logger.info("Loading 'model.pt' at {}.".format(args.model_dir))
-    optimizer_state = torch.load(os.path.join(args.model_dir, 'optimizer.pt'))
-    logger.info("Loading 'optimizer.pt' at {}.".format(args.model_dir))
-    optimizer = torch.optim.SGD(model.parameters(
-    ), lr=args.lr, weight_decay=args.wdecay, momentum=args.momentum)
-    optimizer.load_state_dict(optimizer_state)
-else:
-    model = SimpleLSTM(args, dh.num_class, dh.num_features)
-    optimizer = torch.optim.SGD(model.parameters(
-    ), lr=args.lr, weight_decay=args.wdecay, momentum=args.momentum)
-
-criterion = nn.CrossEntropyLoss()
-
-model = model.to(args.device)
-total_params = sum(x.data.nelement() for x in model.parameters())
-logger.info('Args: {}'.format(args))
-logger.info('Model total parameters: {}'.format(total_params))
-
-tot_steps = 0
-
 def compute_accuracies(index_dict):
     results_list = list(map(lambda x: compute_result(x['class_probs'], x['target']), index_dict.values()))
     ids_acc = sum([x[0] for x in results_list]) / len(results_list)
@@ -110,6 +87,18 @@ def compute_result(class_probs, target):
     res = 1 if pred == target else 0
     return res, target
 
+def init_model(model):
+    # if torch.cuda.device_count() > 1:
+    #     print("Using", torch.cuda.device_count(), "GPUs!")
+    #     model = nn.DataParallel(model)
+    if torch.cuda.is_available():
+        model.cuda(args.device)
+    # Initialize parameters with Glorot / fan_avg.
+    for p in model.parameters():
+        if p.dim() > 1 and p.requires_grad:
+            nn.init.xavier_uniform_(p)
+    return model
+
 def evaluate(dh, batch_size=10):
     model.eval()
     total_loss = 0
@@ -121,6 +110,13 @@ def evaluate(dh, batch_size=10):
         for data, targets, id_ in dh.test_seq():
             n_steps += 1
             data = data.permute(1,0,2)
+            remove_padding = False
+            remaining_samples = 0
+            if data.shape[1] != args.batch_size:
+                remove_padding = True
+                remaining_samples = args.batch_size - data.shape[1]
+                padding = torch.zeros(data.shape[0], remaining_samples, data.shape[2])
+                data = torch.cat((data, padding), 1)
             if torch.cuda.is_available():
                 data = data.cuda()
                 targets = targets.cuda()
@@ -128,6 +124,8 @@ def evaluate(dh, batch_size=10):
             y_classes = targets.tolist()
 
             output, hidden = model(data, hidden)
+            if remove_padding:
+                output = output[:, :-remaining_samples, :]
             loss = criterion(output.view(-1, output.size(2)), targets).data
             total_loss += loss
 
@@ -184,6 +182,30 @@ def train():
         batch += 1
         tot_steps += 1
 
+
+if args.continue_train:
+    model = torch.load(os.path.join(args.model_dir, 'model.pt'))
+    logger.info("Loading 'model.pt' at {}.".format(args.model_dir))
+    optimizer_state = torch.load(os.path.join(args.model_dir, 'optimizer.pt'))
+    logger.info("Loading 'optimizer.pt' at {}.".format(args.model_dir))
+    optimizer = torch.optim.SGD(model.parameters(
+    ), lr=args.lr, weight_decay=args.wdecay, momentum=args.momentum)
+    optimizer.load_state_dict(optimizer_state)
+else:
+    model = SimpleLSTM(args, dh.num_class, dh.num_features)
+    optimizer = torch.optim.SGD(model.parameters(
+    ), lr=args.lr, weight_decay=args.wdecay, momentum=args.momentum)
+
+criterion = nn.CrossEntropyLoss()
+
+
+model = init_model(model)
+# model = model.to(args.device)
+total_params = sum(x.data.nelement() for x in model.parameters())
+logger.info('Args: {}'.format(args))
+logger.info('Model total parameters: {}'.format(total_params))
+
+tot_steps = 0
 
 best_val_loss = []
 stored_loss = np.inf

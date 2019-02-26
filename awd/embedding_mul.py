@@ -49,7 +49,7 @@ class EmbeddingMul(nn.Module):
     def requires_grad(self, value):
         self._requires_grad = value
         logger.info(
-            f"(embedding mul) requires_grad set to {self.requires_grad}. ")
+            "(embedding mul) requires_grad set to {}. ".format(self.requires_grad))
 
     def forward(self, input, weight, padding_idx=None, max_norm=None,
                 norm_type=2., scale_grad_by_freq=False, sparse=False):
@@ -68,14 +68,14 @@ class EmbeddingMul(nn.Module):
         # Checks if unsupported argument are used
         if padding_idx != -1:
             raise NotImplementedError(
-                f"padding_idx must be -1, not {padding_idx}")
+                "padding_idx must be -1, not {}".format(padding_idx))
         if max_norm is not None:
-            raise NotImplementedError(f"max_norm must be None, not {max_norm}")
+            raise NotImplementedError("max_norm must be None, not {}".format(max_norm))
         if scale_grad_by_freq:
-            raise NotImplementedError(f"scale_grad_by_freq must be False, "
-                                      f"not {scale_grad_by_freq}")
+            raise NotImplementedError("scale_grad_by_freq must be False, " + 
+                                      "not {}".format(scale_grad_by_freq))
         if sparse:
-            raise NotImplementedError(f"sparse must be False, not {sparse}")
+            raise NotImplementedError("sparse must be False, not {}".format(sparse))
         # ____________________________________________________________________
 
         if self.last_oh is not None:
