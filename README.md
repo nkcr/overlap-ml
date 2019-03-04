@@ -304,6 +304,42 @@ Expected results (validation / testing):
 python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epoch 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15 --init-seq overlapCN_7
 ```
 
+## Emotions simple LSTM
+
+**Extreme TOI**:
+
+Expected result: `0.475` / `0.377` (WA / UA)
+
+```bash
+main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order complete_random
+```
+
+**Inter-batch TOI**:
+
+Expected result: `0.478` / `0.386` (WA / UA)
+
+```bash
+main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order local_order
+```
+
+**Standard TOI**:
+
+Expected result: `0.486` / `0.404` (WA / UA)
+
+```bash
+main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order standard_order
+```
+
+**Alleviated TOI 10**:
+
+Expected result: 
+
+* 15k steps: `0.553` / `0.489` (WA / UA)
+* 60 epochs: `0.591` / `0.523` (WA / UA)
+
+```bash
+main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order total_order
+```
 
 # Acknowledgements
 
