@@ -50,9 +50,13 @@ The `main_run.py` file, after performing the common initilizations, imports the 
 
 # Commands to reproduce the experiments
 
+**Note**: Those results do not use prime batch size, but the default parameters. To have better results, adapt the `--batch-size` param to the closest prime number.
+
 ## AWD PTB
 
 **Extreme TOI**:
+
+Expected results: `66.38` / `63.49` (validation / testing)
 
 ```bash
 python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --seed-shuffle 141 --epoch 1000 --shuffle-full-seq
@@ -60,17 +64,28 @@ python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dro
 
 **Inter-batch TOI**:
 
+Expected results: `66.96` / `64.20` (validation / testing)
+
 ```bash
 python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --seed-shuffle 141 --epoch 1000 --shuffle-row-seq
 ```
 
 **Standard TOI**:
 
+Expected results: `61.28` / `58.94` (validation / testing)
+
 ```bash
 python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --epoch 1000
 ```
 
 **Alleviated TOI {2,5,7,10}**:
+
+Expected results (validation / testing): 
+
+* 2: `61.73` / `59.37`
+* 5: `63.37` / `60.50`
+* 7: `59.22` / `56.7`
+* 10: `68.09` / `65.88`
 
 ```bash
 overlaps=(2 5 7 10)
@@ -87,11 +102,15 @@ done
 
 **Extreme TOI**
 
+Expected results: `77.14` / `73.52` (validation / testing)
+
 ```bash
 python3 main_run.py --main-model awd-lstm --epochs 750 --data /data/noemien.kocher/datasets/wikitext-2 --dropouth 0.2 --seed 1882 --batch-size 80 --shuffle-full-seq
 ```
 
 **Inter-batch TOI**
+
+Expected results: `76.08` / `72.61` (validation / testing)
 
 ```bash
 python main_run.py --main-model awd-lstm --epochs 750 --data /data/noemien.kocher/datasets/wikitext-2 --dropouth 0.2 --seed 1882 --batch-size 80 --shuffle-row-seq
@@ -99,11 +118,20 @@ python main_run.py --main-model awd-lstm --epochs 750 --data /data/noemien.koche
 
 **Standard TOI**
 
+Expected results: `68.50` / `65.86` (validation / testing)
+
 ```bash
 python3 main_run.py --main-model awd-lstm --epochs 750 --data /data/noemien.kocher/datasets/wikitext-2 --dropouth 0.2 --seed 1882 --batch-size 80
 ```
 
 **Alleviated TOI {2,5,7,10}**
+
+Expected results (validation / testing): 
+
+* 2: `68.56` / `65.51`
+* 5: `69.56` / `66.33`
+* 7: `67.48` / `64.87`
+* 10: `72.95` / `69.69`
 
 ```bash
 overlaps=(2 5 7 10)
@@ -120,11 +148,15 @@ done
 
 **Extreme TOI**
 
+Expected results: `35.22` / `36.19` (validation / testing)
+
 ```bash
 python3 -u main_run.py --main-model awd-lstm --epochs 14 --nlayers 4 --emsize 400 --nhid 2500 --alpha 0 --beta 0 --dropoute 0 --dropouth 0.1 --dropouti 0.1 --dropout 0.1 --wdrop 0 --wdecay 0 --bptt 140 --batch-size 60 --optimizer adam --lr 1e-3 --data /data/noemien.kocher/datasets/wikitext-103 --when 12 --model QRNN --shuffle-full-seq
 ```
 
 **Inter-batch TOI**
+
+Expected results: `35.41` / `36.39` (validation / testing)
 
 ```bash
 python3 -u main_run.py --main-model awd-lstm --epochs 14 --nlayers 4 --emsize 400 --nhid 2500 --alpha 0 --beta 0 --dropoute 0 --dropouth 0.1 --dropouti 0.1 --dropout 0.1 --wdrop 0 --wdecay 0 --bptt 140 --batch-size 60 --optimizer adam --lr 1e-3 --data /data/noemien.kocher/datasets/wikitext-103 --when 12 --model QRNN --shuffle-row-seq
@@ -132,11 +164,20 @@ python3 -u main_run.py --main-model awd-lstm --epochs 14 --nlayers 4 --emsize 40
 
 **Standard TOI**
 
+Expected results: `32.18` / `32.94` (validation / testing)
+
 ```bash
 python3 -u main_run.py --main-model awd-lstm --epochs 14 --nlayers 4 --emsize 400 --nhid 2500 --alpha 0 --beta 0 --dropoute 0 --dropouth 0.1 --dropouti 0.1 --dropout 0.1 --wdrop 0 --wdecay 0 --bptt 140 --batch-size 60 --optimizer adam --lr 1e-3 --data /data/noemien.kocher/datasets/wikitext-103 --when 12 --model QRNN
 ```
 
 **Alleviated TOI {2,5,7,10}**
+
+Expected results (validation / testing): 
+
+* 2: `36.94` / `34.31`
+* 5: `38.50` / `40.04`
+* 7: `31.78` / `32.72`
+* 10: `48.28` / `49.49`
 
 ```bash
 # base num epochs is 14
@@ -155,11 +196,15 @@ done
 
 **Extreme TOI**:
 
+Expected results: `81.97` / `79.08` (validation / testing)
+
 ```bash
 python3 main_run.py --main-model simple-lstm --epochs 100 --batch-size 20 --dropout 0.15 --nlayers 2 --bptt 70 --nhid 1500 --lr-decay 1 --shuffle-full-seq
 ```
 
 **Inter-batch TOI**:
+
+Expected results: `81.67` / `78.59` (validation / testing)
 
 ```bash
 python3 main_run.py --main-model simple-lstm --epochs 100 --batch-size 20 --dropout 0.15 --nlayers 2 --bptt 70 --nhid 1500 --lr-decay 1 --shuffle-row-seq
@@ -167,11 +212,21 @@ python3 main_run.py --main-model simple-lstm --epochs 100 --batch-size 20 --drop
 
 **Standard TOI**:
 
+Expected results: `77.54` / `75.36` (validation / testing)
+
 ```bash
 python3 main_run.py --main-model simple-lstm --epochs 100 --batch-size 20 --dropout 0.15 --nlayers 2 --bptt 70 --nhid 1500 --lr-decay 1
 ```
 
 **Alleviated TOI {2,5,7,10}**:
+
+Expected results (validation / testing): 
+
+* 2: `78.48` / `76.55`
+* 5: `91.95` / `89.64`
+* 7: `77.47` / `74.98`
+* 10: `92.92` / `92.07`
+
 ```bash
 overlaps=(2 5 7 10)
 epochs=100
@@ -187,11 +242,15 @@ done
 
 **Extreme TOI**
 
+Expected results: `101.3` / `96.08` (validation / testing)
+
 ```bash
 python3 main_run.py --main-model simple-lstm --epochs 100 --batch-size 80 --dropout 0.15 --nlayers 2 --bptt 70 --nhid 1150 --lr-decay 1 --data /data/noemien.kocher/datasets/wikitext-2 --shuffle-full-seq
 ```
 
 **Inter-batch TOI**
+
+Expected results: `101.7` / `96.89` (validation / testing)
 
 ```bash
 python3 main_run.py --main-model simple-lstm --epochs 100 --batch-size 80 --dropout 0.15 --nlayers 2 --bptt 70 --nhid 1150 --lr-decay 1 --data /data/noemien.kocher/datasets/wikitext-2 --shuffle-row-seq
@@ -199,11 +258,20 @@ python3 main_run.py --main-model simple-lstm --epochs 100 --batch-size 80 --drop
 
 **Standard TOI**
 
+Expected results: `98.85` / `93.15` (validation / testing)
+
 ```bash
 python3 main_run.py --main-model simple-lstm --epochs 100 --batch-size 80 --dropout 0.15 --nlayers 2 --bptt 70 --nhid 1150 --lr-decay 1 --data /data/noemien.kocher/datasets/wikitext-2
 ```
 
 **Alleviated TOI {2,5,7,10}**
+
+Expected results (validation / testing): 
+
+* 2: `100.4` / `94.49`
+* 5: `113.5` / `106.1`
+* 7: `98.25` / `92.77`
+* 10: `151.0` / `135.1`
 
 ```bash
 overlaps=(2 5 7 10)
@@ -220,11 +288,17 @@ done
 
 **Standard TOI**:
 
+Expected results: `58.49` / `56.19` (validation / testing)
+
 ```bash
 python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epoch 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15
 ```
 
 **Alleviated TOI {2,5,7,10}**:
+
+Expected results (validation / testing): 
+
+* 7: `57.34` / `55.09`
 
 ```bash
 python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epoch 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15 --init-seq overlapCN_7
