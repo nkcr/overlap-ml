@@ -59,7 +59,7 @@ The `main_run.py` file, after performing the common initilizations, imports the 
 Expected results: `66.38` / `63.49` (validation / testing)
 
 ```bash
-python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --seed-shuffle 141 --epoch 1000 --shuffle-full-seq
+python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --seed-shuffle 141 --epochs 1000 --shuffle-full-seq
 ```
 
 **Inter-batch TOI**:
@@ -67,7 +67,7 @@ python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dro
 Expected results: `66.96` / `64.20` (validation / testing)
 
 ```bash
-python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --seed-shuffle 141 --epoch 1000 --shuffle-row-seq
+python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --seed-shuffle 141 --epochs 1000 --shuffle-row-seq
 ```
 
 **Standard TOI**:
@@ -75,7 +75,7 @@ python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dro
 Expected results: `61.28` / `58.94` (validation / testing)
 
 ```bash
-python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --epoch 1000
+python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --epochs 1000
 ```
 
 **Alleviated TOI {2,5,7,10}**:
@@ -93,7 +93,7 @@ epochs=1000
 for k in "${overlaps[@]}"
 do
     :
-    python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --epoch "$(($epochs/$k))" --init-seq "overlapCN_${k}"
+    python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --epochs "$(($epochs/$k))" --init-seq "overlapCN_${k}"
     sleep 10
 done
 ```
@@ -291,7 +291,7 @@ done
 Expected results: `58.49` / `56.19` (validation / testing)
 
 ```bash
-python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epoch 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15
+python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15
 ```
 
 **Alleviated TOI {2,5,7,10}**:
@@ -301,7 +301,7 @@ Expected results (validation / testing):
 * 7: `57.34` / `55.09`
 
 ```bash
-python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epoch 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15 --init-seq overlapCN_7
+python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15 --init-seq overlapCN_7
 ```
 
 ## Emotions simple LSTM
@@ -357,7 +357,7 @@ epochs=1000
 for k in "${P[@]}"
 do
     :
-    python3 main_run.py --main-model awd-lstm-repetitions --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --epoch 1000 --use-repetitions "${k}"
+    python3 main_run.py --main-model awd-lstm-repetitions --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --epochs 1000 --use-repetitions "${k}"
     sleep 10
 done
 ```
