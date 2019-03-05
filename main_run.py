@@ -90,6 +90,7 @@ def add_common_args(parser, model_name):
                         help='Folder to store the stats inside the log '
                         'folder if relative, else to the absolute path plus '
                         'the model id.')
+    parser.add_argument('--use-repetitions', type=int, default=1)
 
     # Train seq shuffling
     parser.add_argument('--shuffle-row-seq', action="store_true",
@@ -430,8 +431,6 @@ class MOS:
                             help='max sequence length')
         parser.add_argument('--single-gpu', default=False, action='store_true',
                             help='use single GPU')
-
-        parser.add_argument('--use-repetitions', type=int, default=1)
 
         args = parser.parse_args()
         return args
