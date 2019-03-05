@@ -2,15 +2,6 @@
 
 Code to reproduce the results from "Alleviating Sequence Information Loss with Data Overlapping and PrimeBatch Sizes".
 
-The taxonomy in the code may differe a bit from the paper, especially regarding the type of experiments. Here is the corresponding terms:
-
-|In the code|In the paper|
-|-----------|------------|
-|No order|Extreme TOI|
-|Local order|Inter-batch TOI|
-|Standard order|Standard TOI|
-|Total order (P)|Alleviated TOI (P)|
-
 Hold experiments on 4 models using the overlapping:
 
 - **simple**, a very basic lstm for language modelling
@@ -19,6 +10,15 @@ Hold experiments on 4 models using the overlapping:
 - **emotion**, a very basic LSTM for emotion detection on voice
 
 To specify which model to run, use `--main-model {simple-lstm | awd-lstm | mos-lstm | emotions-simple-lstm}` argument. There are additional common paramaters, as well as specific parameters for each model. Those can be found in `main_run.py`.
+
+The taxonomy in the code may differe a bit from the paper, especially regarding the type of experiments. Here is the corresponding terms:
+
+|In the code|In the paper|
+|-----------|------------|
+|No order|Extreme TOI|
+|Local order|Inter-batch TOI|
+|Standard order|Standard TOI|
+|Total order (P)|Alleviated TOI (P)|
 
 ## Set-up
 
@@ -339,6 +339,27 @@ Expected result:
 
 ```bash
 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order total_order
+```
+
+## Delayed-reset standard TOI {1,2,5,7,10} with PTB
+
+Expected results (validation / testing): 
+
+* 1: `61.28` / `58.94`
+* 2: `60.76` / `58.55`
+* 5: `60.10` / `57.83`
+* 7: `60.08` / `57.76`
+* 10: `60.05` / `57.78`
+
+```bash
+P=(1 2 5 7 10)
+epochs=1000
+for k in "${P[@]}"
+do
+    :
+    python3 main_run.py --main-model awd-lstm-repetitions --batch-size 20 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --epoch 1000 --use-repetitions "${k}"
+    sleep 10
+done
 ```
 
 # Acknowledgements
