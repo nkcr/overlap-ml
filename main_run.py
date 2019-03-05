@@ -11,11 +11,8 @@ import random
 def add_common_args(parser, model_name):
     parser.add_argument("--main-model", type=str, required=True,
                         choices=["simple-lstm", "awd-lstm",
-                                 "mos-lstm", "emotions-simple-lstm", "awd-lstm_repetitions"],
+                                 "mos-lstm", "emotions-simple-lstm", "awd-lstm-repetitions"],
                         help="The main model to use.")
-
-    parser.add_argument('--use_repetitions', type=int, default=7,
-                        help='number of repetitions')
 
     # Data, seed
     parser.add_argument('--seed', type=int, default=1111,
@@ -35,7 +32,7 @@ def add_common_args(parser, model_name):
     # log directory, log interval
     parser.add_argument('--log-interval', type=int, default=200, metavar='N',
                         help='report interval')
-    parser.add_argument('--log-dir', type=str, default='logs/{}'.format(model_name),
+    parser.add_argument('--log-dir', type=str, default=f'logs/{model_name}',
                         help="Directory containing the runs")
     parser.add_argument('--model-dir', type=str, help='Directory of the run. '
                         'If not specified, one is created based on the time.')
@@ -146,47 +143,45 @@ def common_init(that):
     elif that.args.init_seq.startswith("overlap_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
-            raise Exception(
-                "overlap must divide '--bptt' (found {})".format(overlap))
+            raise Exception(f"overlap must divide '--bptt' (found {overlap})")
         that.ds.current_seq = that.ds.overlap_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapC_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
-            raise Exception(
-                "overlapC must divide '--bptt' (found {})".format(overlap))
+            raise Exception(f"overlapC must divide '--bptt' (found {overlap})")
         that.ds.current_seq = that.ds.overlap_c_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapCN_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
             raise Exception(
-                "overlapCN must divide '--bptt' (found {})".format(overlap))
+                f"overlapCN must divide '--bptt' (found {overlap})")
         that.ds.current_seq = that.ds.overlap_cn_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapCNX_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
             raise Exception(
-                "overlapCN must divide '--bptt' (found {})".format(overlap))
+                f"overlapCNX must divide '--bptt' (found {overlap})")
         that.ds.current_seq = that.ds.overlap_cnx_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapCX_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if that.args.bptt % overlap != 0:
             raise Exception(
-                "overlapCN must divide '--bptt' (found {})".format(overlap))
+                f"overlapCX must divide '--bptt' (found {overlap})")
         that.ds.current_seq = that.ds.overlap_cx_seq(
             that.args.batch_size, overlap)
     elif that.args.init_seq.startswith("overlapCNF_"):
         overlap = int(that.args.init_seq.split("_")[1])
         if overlap > that.args.bptt:
             raise Exception(
-                "overlapCNF must be lower than '--bptt' (found {})".format(overlap))
+                "overlapCNF must be lower than '--bptt' (found {overlap})")
         that.ds.current_seq = that.ds.overlap_cnf_seq(
             that.args.batch_size, overlap)
     else:
-        raise Exception("init-seq unkown: {}".format(that.args.init_seq))
+        raise Exception(f"init-seq unkown: {that.args.init_seq}")
 
     # Type of train_seq
     if that.args.train_seq == "original":
@@ -195,7 +190,7 @@ def common_init(that):
         n = int(that.args.train_seq.split("_")[1])
         that.train_seq = lambda: that.ds.repeated_train_seq(n)
     else:
-        raise Exception("train-seq unkown: {}".format(that.args.train_seq))
+        raise Exception(f"train-seq unkown: {that.args.train_seq}")
 
     # Shuffling of the train_seq
     if that.args.shuffle_row_seq:
@@ -436,8 +431,7 @@ class MOS:
         parser.add_argument('--single-gpu', default=False, action='store_true',
                             help='use single GPU')
 
-        parser.add_argument('--use_repetitions', type=int, default=1)
-        
+        parser.add_argument('--use-repetitions', type=int, default=1)
 
         args = parser.parse_args()
         return args
@@ -448,7 +442,7 @@ if __name__ == "__main__":
         description="Parse only the main model argument")
     parser.add_argument("--main-model", type=str, required=True,
                         choices=["simple-lstm", "awd-lstm",
-                                 "mos-lstm", "emotions-simple-lstm", "awd-lstm_repetitions"],
+                                 "mos-lstm", "emotions-simple-lstm", "awd-lstm-repetitions"],
                         help="The main model to use.")
     args, remaining = parser.parse_known_args()
 
@@ -458,7 +452,7 @@ if __name__ == "__main__":
         from mos import main
     elif args.main_model == "awd-lstm":
         from awd import main
-    elif args.main_model == "awd-lstm_repetitions":
+    elif args.main_model == "awd-lstm-repetitions":
         from awd import repetitions_main as main
     elif args.main_model == "emotions-simple-lstm":
         from emotions import main
