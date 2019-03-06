@@ -21,9 +21,9 @@ from common.utils import repackage_hidden, \
 
 from main_run import MOS
 
-mos = MOS()
+launcher = MOS()
 
-args = mos.args
+args = launcher.args
 
 if args.nhidlast < 0:
     args.nhidlast = args.emsize
@@ -37,11 +37,13 @@ if args.small_batch_size < 0:
 # Initializations
 ###############################################################################
 
-logger = mos.logger
+logger = launcher.logger
 # Tensorboard
-tb = mos.tb
+tb = launcher.tb
 # DataSelector
-ds = mos.ds
+ds = launcher.ds
+
+train_seq = launcher.train_seq
 
 ###############################################################################
 # Build the model
@@ -102,7 +104,7 @@ def train():
     hidden = [model.init_hidden(args.small_batch_size) for _ in range(
         args.batch_size // args.small_batch_size)]
     batch = 0
-    for data, targets in ds.train_seq():
+    for data, targets in train_seq():
         seq_len = args.bptt
 
         lr2 = optimizer.param_groups[0]['lr']
