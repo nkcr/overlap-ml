@@ -349,7 +349,7 @@ python3 main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --drop
 Expected result: `0.475` / `0.377` (WA / UA)
 
 ```bash
-python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order complete_random
+python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv --test-batch-size 20 --lr 0.05 --log-interval 20 --lr-decay 1 --step-size 0.1 --epochs 60 --order complete_random
 ```
 
 **Inter-batch TOI**:
@@ -357,7 +357,7 @@ python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP
 Expected result: `0.478` / `0.386` (WA / UA)
 
 ```bash
-python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order local_order
+python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv --test-batch-size 20 --lr 0.05 --log-interval 20 --lr-decay 1 --step-size 0.1 --epochs 60 --window-size 300 --order local_order
 ```
 
 **Standard TOI**:
@@ -365,7 +365,7 @@ python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP
 Expected result: `0.486` / `0.404` (WA / UA)
 
 ```bash
-python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order standard_order
+python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv --test-batch-size 20 --lr 0.05 --log-interval 20 --lr-decay 1 --step-size 0.1 --epochs 60 --order standard_order
 ```
 
 **Alleviated TOI 10**:
@@ -376,7 +376,7 @@ Expected result:
 * 60 epochs: `0.591` / `0.523` (WA / UA)
 
 ```bash
-python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order total_order
+python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv --test-batch-size 20 --lr 0.05 --log-interval 20 --lr-decay 1 --step-size 0.1 --epochs 60 --order total_order
 ```
 
 ## Delayed-reset standard TOI {1,2,5,7,10} with PTB
