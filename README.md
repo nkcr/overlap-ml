@@ -52,9 +52,43 @@ The `main_run.py` file, after performing the common initilizations, imports the 
 
 **Note**: Those results do not use prime batch size, but the default parameters. To have better results, adapt the `--batch-size` param to the closest prime number.
 
-**Quick navigation**:
+**Quick anchors navigation**:
 
-|||
+<table>
+    <tr>
+        <th>Model</th><th>Dataset</th><th>Experiments</th>
+    </tr>
+    <tr>
+        <td rowspan="3">AWD</td>
+        <td>PTB</td>
+        <td><a href="#awd-ptb">Extreme / Inter-batch / Original / Alleviated TOI</a></td>
+    </tr>
+        <td>WT2</td>
+        <td><a href="#awd-wt2">Extreme / Inter-batch / Original / Alleviated TOI</a></td>
+    </tr>
+    <tr>
+        <td>WT103</td>
+        <td><a href="#awd-wt103">Extreme / Inter-batch / Original / Alleviated TOI</a></td>
+    </tr>
+    <tr>
+        <td rowspan="2">Text simple LSTM</td>
+        <td>PTB</td>
+        <td><a href="#simple-ptb">Extreme / Inter-batch / Original / Alleviated TOI</a></td>
+    </tr>
+        <td>WT2</td>
+        <td><a href="#simple-wt2">Extreme / Inter-batch / Original / Alleviated TOI</a></td>
+    </tr>
+    <tr>
+        <td rowspan="1">MOS</td>
+        <td>PTB</td>
+        <td><a href="#mos-ptb">Original / Alleviated TOI</a></td>
+    </tr>
+    <tr>
+        <td rowspan="1">Voice simple LSTM</td>
+        <td>IEMOCAP</td>
+        <td><a href="#voice-simple-lstm">Extreme / Inter-batch / Original / Alleviated TOI</a></td>
+    </tr>
+</table>
 
 ## AWD PTB
 
@@ -295,7 +329,7 @@ done
 Expected results: `58.49` / `56.19` (validation / testing)
 
 ```bash
-python main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch-size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n-experts 15
+python3 main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch-size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n-experts 15
 ```
 
 **Alleviated TOI {2,5,7,10}**:
@@ -305,10 +339,10 @@ Expected results (validation / testing):
 * 7: `57.34` / `55.09`
 
 ```bash
-python main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch-size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n-experts 15 --init-seq overlapCN_7
+python3 main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch-size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n-experts 15 --init-seq overlapCN_7
 ```
 
-## Emotions simple LSTM
+## Voice simple LSTM
 
 **Extreme TOI**:
 
