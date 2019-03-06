@@ -52,6 +52,10 @@ The `main_run.py` file, after performing the common initilizations, imports the 
 
 **Note**: Those results do not use prime batch size, but the default parameters. To have better results, adapt the `--batch-size` param to the closest prime number.
 
+**Quick navigation**:
+
+|||
+
 ## AWD PTB
 
 **Extreme TOI**:
@@ -291,7 +295,7 @@ done
 Expected results: `58.49` / `56.19` (validation / testing)
 
 ```bash
-python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15
+python main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch-size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n-experts 15
 ```
 
 **Alleviated TOI {2,5,7,10}**:
@@ -301,7 +305,7 @@ Expected results (validation / testing):
 * 7: `57.34` / `55.09`
 
 ```bash
-python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15 --init-seq overlapCN_7
+python main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch-size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n-experts 15 --init-seq overlapCN_7
 ```
 
 ## Emotions simple LSTM
@@ -311,7 +315,7 @@ python main.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 
 Expected result: `0.475` / `0.377` (WA / UA)
 
 ```bash
-main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order complete_random
+python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order complete_random
 ```
 
 **Inter-batch TOI**:
@@ -319,7 +323,7 @@ main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_fea
 Expected result: `0.478` / `0.386` (WA / UA)
 
 ```bash
-main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order local_order
+python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order local_order
 ```
 
 **Standard TOI**:
@@ -327,7 +331,7 @@ main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_fea
 Expected result: `0.486` / `0.404` (WA / UA)
 
 ```bash
-main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order standard_order
+python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order standard_order
 ```
 
 **Alleviated TOI 10**:
@@ -338,7 +342,7 @@ Expected result:
 * 60 epochs: `0.591` / `0.523` (WA / UA)
 
 ```bash
-main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order total_order
+python3 main_run.py --main-model emotions-simple-lstm --cv 5 --data data/IEMOCAP/all_features_cv/ --test-batch-size 1 --lr 0.1 --log-interval 20 --lr-decay 1 --order total_order
 ```
 
 ## Delayed-reset standard TOI {1,2,5,7,10} with PTB
