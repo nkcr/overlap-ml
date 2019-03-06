@@ -4,10 +4,10 @@ Code to reproduce the results from "Alleviating Sequence Information Loss with D
 
 Hold experiments on 4 models using the overlapping:
 
-- **simple**, a very basic lstm for language modelling
-- **awd**, [AWD](https://arxiv.org/abs/1708.02182) ASGD Weight-Dropped LSTM
-- **mos**, [MOS](https://arxiv.org/abs/1711.03953) Mixture of Softmaxes
-- **emotion**, a very basic LSTM for emotion detection on voice
+- **awd**, [AWD](https://arxiv.org/abs/1708.02182) ASGD Weight-Dropped LSTM, (`/awd`)
+- **text simple**, a very basic lstm for language modelling, (`/simple`)
+- **mos**, [MOS](https://arxiv.org/abs/1711.03953) Mixture of Softmaxes, (`/mos`)
+- **voice simple**, a very basic LSTM for emotion detection on voice, (`/emotions`)
 
 To specify which model to run, use `--main-model {simple-lstm | awd-lstm | mos-lstm | emotions-simple-lstm}` argument. There are additional common paramaters, as well as specific parameters for each model. Those can be found in `main_run.py`.
 
