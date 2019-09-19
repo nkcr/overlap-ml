@@ -45,7 +45,7 @@ You can check your setup by launching a quick training over one epoch with the f
 python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --epochs 1 --nhid 5 --emsize 5 --nlayers 1 --bptt 5
 ```
 
-The program should exit without error and write the logs in the `logs/` folder. You can watch the logs with tensorbord by launching the following command:
+The program should exit without error and write the logs in the `logs/` folder. You can watch the logs with tensorboard by launching the following command:
 
 ```bash
 tensorboard --logdir logs/
