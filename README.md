@@ -34,9 +34,21 @@ For emotions, add in `data/IEMOCAP/` the `all_features_cv` files.
 We use python `3.6` with Pytorch `0.4.1`. To create a new python environement and install dependencies, run:
 
 ```bash
-python3.6 -m virtualenv venv
+python3 -m virtualenv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
+```
+
+You can check your setup by launching a quick training over one epoch with the following command:
+
+```bash
+python3 main_run.py --main-model awd-lstm --batch-size 20 --data data/penn --epochs 1 --nhid 5 --emsize 5 --nlayers 1 --bptt 5
+```
+
+The program should exit without error and write the logs in the `logs/` folder. You can watch the logs with tensorbord by launching the following command:
+
+```bash
+tensorboard --logdir logs/
 ```
 
 ## About the files
