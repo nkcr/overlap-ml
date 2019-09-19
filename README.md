@@ -1,6 +1,6 @@
 # Overlapping with language modelling
 
-Code to reproduce the results from "Alleviating Sequence Information Loss with Data Overlapping and PrimeBatch Sizes".
+Pytorch implementation to reproduce experiments from "Alleviating Sequence Information Loss with Data Overlapping and PrimeBatch Sizes".
 
 Hold experiments on 4 models using the overlapping:
 
