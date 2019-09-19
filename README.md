@@ -1,4 +1,4 @@
-# Overlapping with language modelling
+# Overlapping with language modelling and emotion detection
 
 Pytorch implementation to reproduce experiments from "Alleviating Sequence Information Loss with Data Overlapping and Prime Batch Sizes".
 
