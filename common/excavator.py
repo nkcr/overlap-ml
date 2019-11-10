@@ -370,7 +370,7 @@ class DataSelector:
         dsize = self.train_data.size(0)
         real_shift = self.args.bptt / overlap
         shift = int(round(real_shift))
-        ndatapoints = sum([(dsize-i*shift) // self.args.bptt
+        ndatapoints = sum([(dsize-int(round(i*real_shift))) // self.args.bptt
                            for i in range(overlap)])
         result = []
         for i in range(overlap):
