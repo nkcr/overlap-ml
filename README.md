@@ -42,6 +42,8 @@ The taxonomy in the code may differe a bit from the paper, especially regarding 
 |Standard order|Standard TOI|
 |Total order (P)|Alleviated TOI (P)|
 
+Experiments were run on a Tesla P100 GPU. Results are very likely to differ based on the GPU used.
+
 ## Set-up
 
 Download the data (PTB, WT2, WT103):
@@ -170,6 +172,26 @@ do
 done
 ```
 
+💥 With a prime batch size:
+
+Expected results (validation / testing): 
+
+* 2: `60.56` / `57.97`
+* 5: `59.52` / `57.14`
+* 7: `59.43` / `57.16`
+* 10: `58.96` / **`56.46`**
+
+```bash
+overlaps=(2 5 7 10)
+epochs=1000
+for k in "${overlaps[@]}"
+do
+    :
+    python3 main_run.py --main-model awd-lstm --batch-size 19 --data data/penn --dropouti 0.4 --dropouth 0.25 --seed 141 --epochs "$(($epochs/$k))" --init-seq "overlapCN_${k}"
+    sleep 10
+done
+```
+
 ## AWD WT2
 
 **Extreme TOI**
@@ -212,6 +234,26 @@ for k in "${overlaps[@]}"
 do
     :
     python3 main_run.py --main-model awd-lstm --data /data/noemien.kocher/datasets/wikitext-2 --dropouth 0.2 --seed 1882 --batch-size 80 --epochs "$(($epochs/$k))" --init-seq "overlapCN_${k}"
+    sleep 10
+done
+```
+
+💥 With a prime batch size:
+
+Expected results (validation / testing): 
+
+* 2: `68.11` / `65.14`
+* 5: `67.74` / `65.11`
+* 7: `67.79` / `64.79`
+* 10: `67.47` / **`64.73`**
+
+```bash
+overlaps=(2 5 7 10)
+epochs=750
+for k in "${overlaps[@]}"
+do
+    :
+    python3 main_run.py --main-model awd-lstm --data /data/noemien.kocher/datasets/wikitext-2 --dropouth 0.2 --seed 1882 --batch-size 79 --epochs "$(($epochs/$k))" --init-seq "overlapCN_${k}"
     sleep 10
 done
 ```
@@ -260,6 +302,28 @@ for i in "${!overlaps[@]}"
 do
         :
         python3 -u main_run.py --main-model awd-lstm --epochs 14 --nlayers 4 --emsize 400 --nhid 2500 --alpha 0 --beta 0 --dropoute 0 --dropouth 0.1 --dropouti 0.1 --dropout 0.1 --wdrop 0 --wdecay 0 --bptt 140 --batch-size 60 --optimizer adam --lr 1e-3 --data /data/noemien.kocher/datasets/wikitext-103 --when-steps "$when_steps" --model QRNN --init-seq "overlapCN_${overlaps[$i]}" --log-dir /data/noemien.kocher/logs/ --max-steps "$max_steps"
+        sleep 10
+done
+```
+
+💥 With a prime batch size:
+
+Expected results (validation / testing): 
+
+* 2: `32.00` / `32.98`
+* 5: `31.93` / `33.07`
+* 7: `31.78` / `32.89`
+* 10: `31.92` / **`32.85`**
+
+```bash
+# base num epochs is 14
+overlaps=(2 5 7 10)
+when_steps=147456
+max_steps=172032
+for i in "${!overlaps[@]}"
+do
+        :
+        python3 -u main_run.py --main-model awd-lstm --epochs 14 --nlayers 4 --emsize 400 --nhid 2500 --alpha 0 --beta 0 --dropoute 0 --dropouth 0.1 --dropouti 0.1 --dropout 0.1 --wdrop 0 --wdecay 0 --bptt 140 --batch-size 59 --optimizer adam --lr 1e-3 --data /data/noemien.kocher/datasets/wikitext-103 --when-steps "$when_steps" --model QRNN --init-seq "overlapCN_${overlaps[$i]}" --log-dir /data/noemien.kocher/logs/ --max-steps "$max_steps"
         sleep 10
 done
 ```
@@ -368,6 +432,8 @@ python3 main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --drop
 
 **Alleviated TOI {1..40}**:
 
+💥 With a prime batch size:
+
 ```bash
 epochs=2000
 for k in {1..70}
@@ -414,7 +480,7 @@ Expected results (validation / testing):
 * 32: `57.21` / `55.26`
 * 33: `57.66` / `55.40`
 * 34: `57.48` / `55.44`
-* 35: `56.44` / **`54.33`** (post result, not in the paper)
+* 35: `56.44` / **`54.33`** (post-result, not in the paper)
 * 36: `57.10` / `55.09`
 * 37: `57.55` / `55.29`
 * 38: `57.04` / `54.87`
