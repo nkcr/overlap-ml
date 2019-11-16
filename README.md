@@ -1,8 +1,30 @@
 # Overlapping with language modelling and emotion detection
 
-Pytorch implementation to reproduce experiments from "[Alleviating Sequence Information Loss with Data Overlapping and Prime Batch Sizes](https://arxiv.org/abs/1909.08700)".
+Pytorch implementation to reproduce experiments from "[Alleviating Sequence Information Loss with Data Overlapping and Prime Batch Sizes](https://arxiv.org/abs/1909.08700)" - ([poser](poster-conll.pdf)).
 
-Hold experiments on 4 models using the overlapping:
+If you use this code or our results in your research, please cite as appropriate:
+
+```
+@inproceedings{kocher-etal-2019-alleviating,
+    title = "Alleviating Sequence Information Loss with Data Overlapping and Prime Batch Sizes",
+    author = "Kocher, No{\'e}mien  and
+      Scuito, Christian  and
+      Tarantino, Lorenzo  and
+      Lazaridis, Alexandros  and
+      Fischer, Andreas  and
+      Musat, Claudiu",
+    booktitle = "Proceedings of the 23rd Conference on Computational Natural Language Learning (CoNLL)",
+    month = nov,
+    year = "2019",
+    address = "Hong Kong, China",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/K19-1083",
+    doi = "10.18653/v1/K19-1083",
+    pages = "890--899",
+}
+```
+
+This repo holds experiments on 4 models using the "overlapping" method:
 
 - **awd**, [AWD](https://arxiv.org/abs/1708.02182) ASGD Weight-Dropped LSTM, (`/awd`)
 - **text simple**, a very basic lstm for language modelling, (`/simple`)
@@ -344,15 +366,60 @@ Expected results: `58.49` / `56.19` (validation / testing)
 python3 main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch-size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n-experts 15
 ```
 
-**Alleviated TOI {2,5,7,10}**:
+**Alleviated TOI {1..40}**:
+
+```bash
+epochs=2000
+for k in {1..70}
+do
+        :
+        python3 main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch-size 13 --lr 20.0 --epochs "$(($epochs/$k))" --nhid 960 --nhidlast 620 --emsize 280 --n-experts 15 --init-seq "overlapCNF_${k}"
+        sleep 10
+done
+```
 
 Expected results (validation / testing): 
 
-* 7: `57.34` / `55.09`
-
-```bash
-python3 main_run.py --main-model mos-lstm --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch-size 12 --lr 20.0 --epochs 1000 --nhid 960 --nhidlast 620 --emsize 280 --n-experts 15 --init-seq overlapCN_7
-```
+* 1: `58.36` /	`56.21`
+* 2: `58.07` /	`55.76`
+* 3: `58.03` /	`55.79`
+* 4: `52.82` /	`55.63`
+* 5: `57.81` /	`55.63`
+* 6: `57.55` /	`55.32`
+* 7: `57.47` /	`55.23`
+* 8: `57.47` /	`55.34`
+* 9: `57.16` /	`54.93`
+* 10: `57.34` / `54.90`
+* 11: `57.11` / `54.98`
+* 12: `57.47` / `55.44`
+* 13: `67.77` / `66.01`
+* 14: `56.76` / **`54.58`** (paper's result)
+* 15: `57.44` / `55.20`
+* 16: `56.95` / `54.86`
+* 17: `57.64` / `55.14`
+* 18: `57.38` / `54.93`
+* 19: `57.55` / `55.35`
+* 20: `57.00` / `54.67`
+* 21: `57.55` / `55.22`
+* 22: `57.54` / `55.19`
+* 23: `57.29` / `54.90`
+* 24: `57.47` / `55.11`
+* 25: `57.12` / `54.85`
+* 26: `66.14` / `63.81`
+* 27: `57.08` / `54.85`
+* 28: `--.--` / `--.--`
+* 29: `--.--` / `--.--`
+* 30: `--.--` / `--.--`
+* 31: `57.74` / `55.37`
+* 32: `57.21` / `55.26`
+* 33: `57.66` / `55.40`
+* 34: `57.48` / `55.44`
+* 35: `56.44` / **`54.33`** (post result, not in the paper)
+* 36: `57.10` / `55.09`
+* 37: `57.55` / `55.29`
+* 38: `57.04` / `54.87`
+* 39: `64.37` / `62.54`
+* 40: `57.52` / `54.99`
 
 ## Voice simple LSTM
 
