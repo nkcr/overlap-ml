@@ -1,6 +1,6 @@
 # Overlapping with language modelling and emotion detection
 
-Pytorch implementation to reproduce experiments from "[Alleviating Sequence Information Loss with Data Overlapping and Prime Batch Sizes](https://arxiv.org/abs/1909.08700)" - ([poser](poster-conll.pdf)).
+Pytorch implementation to reproduce experiments from "[Alleviating Sequence Information Loss with Data Overlapping and Prime Batch Sizes](https://arxiv.org/abs/1909.08700)" - ([poster](poster-conll.pdf)).
 
 If you use this code or our results in your research, please cite as appropriate:
 
